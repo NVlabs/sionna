@@ -1,0 +1,1052 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LMMSEChannelEstimator &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=cffce40c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/leaderboard/styles.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"chtml": {"matchFontHeight": false}, "tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'bench/benchmarks/mimo_ofdm_chest/estimators/linear/sionna.phy.ofdm.LMMSEChannelEstimator';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <script type="module" src="../../../../../_static/leaderboard/app.js"></script>
+    <link rel="canonical" href="/sionna/bench/benchmarks/mimo_ofdm_chest/estimators/linear/sionna.phy.ofdm.LMMSEChannelEstimator.html" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="TruncatedChannelEstimator" href="sionna.bench.mimo_ofdm_chest.papers.edfors1996.TruncatedChannelEstimator.html" />
+    <link rel="prev" title="LSChannelEstimator" href="sionna.phy.ofdm.LSChannelEstimator.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../../../../../_static/searchtools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    <script src="../../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../../index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../../index.html">Benchmarks</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../index.html">MIMO-OFDM Channel Estimation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../leaderboard.html">Leaderboard</a></li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="../index.html">Channel Estimators</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4 current active has-children"><a class="reference internal" href="index.html">Linear Channel Estimators</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="sionna.phy.ofdm.LSChannelEstimator.html">LSChannelEstimator</a></li>
+<li class="toctree-l5 current active"><a class="current reference internal" href="#">LMMSEChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="sionna.bench.mimo_ofdm_chest.papers.edfors1996.TruncatedChannelEstimator.html">TruncatedChannelEstimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../interpolators/index.html">Channel Interpolators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../interpolators/sionna.phy.ofdm.NearestNeighborInterpolator.html">NearestNeighborInterpolator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../interpolators/sionna.phy.ofdm.LinearInterpolator.html">LinearInterpolator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../interpolators/sionna.bench.mimo_ofdm_chest.papers.coleri2002.CombInterpolator.html">CombInterpolator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../sparse/index.html">Sparsity-Based Channel Estimators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../sparse/sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator.html">RKHSChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../sparse/sionna.bench.mimo_ofdm_chest.papers.lyu2026.SparseDiffuseChannelEstimator.html">SparseDiffuseChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../sparse/sionna.bench.mimo_ofdm_chest.papers.wei2017.SBLChannelEstimator.html">SBLChannelEstimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../latent_variable/index.html">Latent Variable-Based Channel Estimators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../latent_variable/sionna.bench.mimo_ofdm_chest.papers.baur2022.VAEChannelEstimator.html">VAEChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../latent_variable/sionna.bench.mimo_ofdm_chest.papers.koller2022.SpatialGMMChannelEstimator.html">SpatialGMMChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../latent_variable/sionna.bench.mimo_ofdm_chest.papers.koller2022.SpectralGMMChannelEstimator.html">SpectralGMMChannelEstimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../neural_networks/index.html">Neural Network-Based Channel Estimators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../neural_networks/sionna.bench.mimo_ofdm_chest.papers.li2020.ReEsNetChannelEstimator.html">ReEsNetChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../neural_networks/sionna.bench.mimo_ofdm_chest.papers.balevi2020.DeepPriorChannelEstimator.html">DeepPriorChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../neural_networks/sionna.bench.mimo_ofdm_chest.papers.melgar2022.DNNChannelEstimator.html">DNNChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../neural_networks/sionna.bench.mimo_ofdm_chest.papers.melgar2022.InterpolatedDNNChannelEstimator.html">InterpolatedDNNChannelEstimator</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../get_started.html">Get Started</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../../index.html" class="nav-link">Bench</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Benchmarks</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">MIMO-OFDM Channel Estimation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Channel Estimators</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Linear Channel Estimators</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">LMMSEChannelEstimator</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="lmmsechannelestimator">
+<h1>LMMSEChannelEstimator<a class="headerlink" href="#lmmsechannelestimator" title="Link to this heading">#</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Estimator constructor defaults mirror the settings used during benchmarking.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">estimate_covariance()</span></code> defaults mirror the settings used to estimate the covariance.</p></li>
+</ul>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">sionna.phy.ofdm.</span></span><span class="sig-name descname"><span class="pre">LMMSEChannelEstimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../../../phy/api/ofdm/sionna.phy.ofdm.ResourceGrid.html#sionna.phy.ofdm.ResourceGrid" title="sionna.phy.ofdm.resource_grid.ResourceGrid"><span class="pre">sionna.phy.ofdm.resource_grid.ResourceGrid</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_mat_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_mat_freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_mat_space</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'t-f'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'single'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'double'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/sionna/phy/ofdm/channel_estimation.html#LMMSEChannelEstimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../../../../phy/api/ofdm/sionna.phy.ofdm.BaseChannelEstimator.html#sionna.phy.ofdm.BaseChannelEstimator" title="sionna.phy.ofdm.channel_estimation.BaseChannelEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.phy.ofdm.channel_estimation.BaseChannelEstimator</span></code></a></p>
+<p>LMMSE channel estimation for MIMO OFDM systems, where LMMSE filtering
+(interpolation and smoothing) is applied across time, frequency, and (optionally) spatial
+dimensions. Here, <em>interpolation</em> refers to estimating the channel at resource elements
+without an input estimate, while <em>smoothing</em> refers to updating existing
+estimates using channel statistics and error variances. The frequency and time
+passes perform both interpolation and smoothing, whereas the optional spatial
+pass performs smoothing only. We use <em>filtering</em> as an umbrella term for both
+operations.</p>
+<p>Depending on the value of <code class="docutils literal notranslate"><span class="pre">order</span></code>, the filtering is
+carried out across time (t), i.e., OFDM symbols, frequency (f), i.e.,
+subcarriers, and optionally space (s), i.e., receive antennas, in any
+desired order.</p>
+<p>For simplicity, we describe the underlying algorithm assuming that
+filtering across the sub-carriers is performed first,
+followed by filtering across OFDM symbols, and finally
+by smoothing across receive antennas.
+The algorithm is similar if filtering is performed in
+a different order.
+For clarity, antenna indices are omitted when describing frequency and time
+filtering, as the same process is applied to all the antennas.</p>
+<p>From the input <code class="docutils literal notranslate"><span class="pre">y</span></code>, we start by extracting the observations at the non-zero
+positions of the <code class="docutils literal notranslate"><span class="pre">PilotPattern</span></code> and arranging them in a resource grid
+with the following model:
+<span class="math notranslate nohighlight">\(\mathbf{Y} = \mathbf{H} \odot \mathbf{P} + \mathbf{N} \in \mathbb{C}^{N \times M}\)</span>,
+where <span class="math notranslate nohighlight">\(\mathbf{Y}\)</span> are the observations, <span class="math notranslate nohighlight">\(\mathbf{H} \in \mathbb{C}^{N \times M}\)</span>
+is the channel matrix, <span class="math notranslate nohighlight">\(\mathbf{P} \in \mathbb{C}^{N \times M}\)</span> is the matrix of
+non-zero pilots, and <span class="math notranslate nohighlight">\(\mathbf{N} \in \mathbb{C}^{N \times M}\)</span> is the noise matrix.
+<span class="math notranslate nohighlight">\(N\)</span> denotes the number of OFDM symbols and <span class="math notranslate nohighlight">\(M\)</span> the number of sub-carriers.</p>
+<p>A least-squares (LS) estimate and corresponding error variances are first computed as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\hat{\mathbf{H}} &amp;= \mathbf{Y} \odot
+                   \frac{\mathbf{P}^\star}{\left|\mathbf{P}\right|^2}
+                 = \mathbf{H} + \tilde{\mathbf{H}}\\
+     \sigma^2_{n,m} &amp;= \mathbb{E}\left[\tilde{h}_{n,m} \tilde{h}_{n,m}^\star \right]
+                 = \frac{N_0}{\left|p_{n,m}\right|^2}.\end{split}\]</div>
+<p>The first pass then consists in filtering across the sub-carriers:</p>
+<div class="math notranslate nohighlight">
+\[\hat{\mathbf{h}}_n^{(1)} = \mathbf{A}_n \hat{\mathbf{h}}_n\]</div>
+<p>where <span class="math notranslate nohighlight">\(1 \leq n \leq N\)</span> is the OFDM symbol index and
+<span class="math notranslate nohighlight">\(\hat{\mathbf{h}}_n\)</span> is the <span class="math notranslate nohighlight">\(n^{\text{th}}\)</span> (transposed) row
+of <span class="math notranslate nohighlight">\(\hat{\mathbf{H}}\)</span>.
+<span class="math notranslate nohighlight">\(\mathbf{A}_n\)</span> is the <span class="math notranslate nohighlight">\(M \times M\)</span> matrix such that:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{A}_n = \bar{\mathbf{A}}_n \mathbf{\Pi}_n^\intercal\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\bar{\mathbf{A}}_n = \underset{\mathbf{Z} \in \mathbb{C}^{M \times K_n}}{\text{argmin}} \left\lVert \mathbf{Z}\left( \mathbf{\Pi}_n^\intercal \mathbf{R^{(f)}} \mathbf{\Pi}_n + \mathbf{\Sigma}_n \right) - \mathbf{R^{(f)}} \mathbf{\Pi}_n \right\rVert_{\text{F}}^2\]</div>
+<p>and <span class="math notranslate nohighlight">\(\mathbf{R^{(f)}}\)</span> is the <span class="math notranslate nohighlight">\(M \times M\)</span> channel frequency
+covariance matrix,
+<span class="math notranslate nohighlight">\(\mathbf{\Pi}_n\)</span> the <span class="math notranslate nohighlight">\(M \times K_n\)</span> matrix that spreads
+<span class="math notranslate nohighlight">\(K_n\)</span> values to a vector of size <span class="math notranslate nohighlight">\(M\)</span> according to the
+<code class="docutils literal notranslate"><span class="pre">pilot_pattern</span></code> for the <span class="math notranslate nohighlight">\(n^{\text{th}}\)</span> OFDM symbol,
+and <span class="math notranslate nohighlight">\(\mathbf{\Sigma}_n \in \mathbb{R}^{K_n \times K_n}\)</span> is the
+channel estimation error covariance built from <code class="docutils literal notranslate"><span class="pre">err_var</span></code> and assumed to
+be diagonal.
+Computation of <span class="math notranslate nohighlight">\(\bar{\mathbf{A}}_n\)</span> uses a diagonally loaded
+Cholesky factorization followed by triangular solves. The diagonal loading
+improves numerical stability for badly conditioned covariance matrices.</p>
+<p>The channel estimation error variances after the first filtering pass
+are computed as</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{\Sigma}^{(1)}_n = \text{diag} \left( \mathbf{R^{(f)}} - \mathbf{A}_n \mathbf{\Xi}_n \mathbf{R^{(f)}} \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{\Xi}_n\)</span> is the diagonal matrix of size
+<span class="math notranslate nohighlight">\(M \times M\)</span> that zeros the columns corresponding to sub-carriers
+not carrying any pilots.
+Note that interpolation is not performed for OFDM symbols which do not
+carry pilots.</p>
+<p><strong>Remark</strong>: The filter matrix differs across OFDM symbols as
+different OFDM symbols may carry pilots on different sub-carriers and/or
+have different estimation error variances.</p>
+<p>Scaling of the estimates is then performed to ensure that their
+variances match the ones expected by the next filtering step, and the
+error variances are updated accordingly:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+    \left[\hat{\mathbf{h}}_n^{(2)}\right]_m &amp;= s_{n,m} \left[\hat{\mathbf{h}}_n^{(1)}\right]_m\\
+    \left[\mathbf{\Sigma}^{(2)}_n\right]_{m,m}  &amp;= s_{n,m}\left( s_{n,m}-1 \right) \left[\hat{\mathbf{\Sigma}}^{(1)}_n\right]_{m,m} + \left( 1 - s_{n,m} \right) \left[\mathbf{R^{(f)}}\right]_{m,m} + s_{n,m} \left[\mathbf{\Sigma}^{(1)}_n\right]_{m,m}
+\end{aligned}\end{split}\]</div>
+<p>where the scaling factor <span class="math notranslate nohighlight">\(s_{n,m}\)</span> is such that:</p>
+<div class="math notranslate nohighlight">
+\[\mathbb{E} \left\{ \left\lvert s_{n,m} \left[\hat{\mathbf{h}}_n^{(1)}\right]_m \right\rvert^2 \right\} = \left[\mathbf{R^{(f)}}\right]_{m,m} +  \mathbb{E} \left\{ \left\lvert s_{n,m} \left[\hat{\mathbf{h}}^{(1)}_n\right]_m - \left[\mathbf{h}_n\right]_m \right\rvert^2 \right\}\]</div>
+<p>which leads to:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+    s_{n,m} &amp;= \frac{2 \left[\mathbf{R^{(f)}}\right]_{m,m}}{\left[\mathbf{R^{(f)}}\right]_{m,m} - \left[\mathbf{\Sigma}^{(1)}_n\right]_{m,m} + \left[\hat{\mathbf{\Sigma}}^{(1)}_n\right]_{m,m}}\\
+    \hat{\mathbf{\Sigma}}^{(1)}_n &amp;= \mathbf{A}_n \mathbf{R^{(f)}} \mathbf{A}_n^{\mathrm{H}}.
+\end{aligned}\end{split}\]</div>
+<p>The second pass consists in filtering across the OFDM symbols:</p>
+<div class="math notranslate nohighlight">
+\[\hat{\mathbf{h}}_m^{(3)} = \mathbf{B}_m \tilde{\mathbf{h}}^{(2)}_m\]</div>
+<p>where <span class="math notranslate nohighlight">\(1 \leq m \leq M\)</span> is the sub-carrier index and
+<span class="math notranslate nohighlight">\(\tilde{\mathbf{h}}^{(2)}_m\)</span> is the <span class="math notranslate nohighlight">\(m^{\text{th}}\)</span> column of</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\hat{\mathbf{H}}^{(2)} = \begin{bmatrix}
+                            {\hat{\mathbf{h}}_1^{(2)}}^\intercal\\
+                            \vdots\\
+                            {\hat{\mathbf{h}}_N^{(2)}}^\intercal
+                         \end{bmatrix}\end{split}\]</div>
+<p>and <span class="math notranslate nohighlight">\(\mathbf{B}_m\)</span> is the <span class="math notranslate nohighlight">\(N \times N\)</span> LMMSE filter
+matrix:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{B}_m = \bar{\mathbf{B}}_m \tilde{\mathbf{\Pi}}_m^\intercal\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\bar{\mathbf{B}}_m = \underset{\mathbf{Z} \in \mathbb{C}^{N \times L_m}}{\text{argmin}} \left\lVert \mathbf{Z} \left( \tilde{\mathbf{\Pi}}_m^\intercal \mathbf{R^{(t)}}\tilde{\mathbf{\Pi}}_m + \tilde{\mathbf{\Sigma}}^{(2)}_m \right) -  \mathbf{R^{(t)}}\tilde{\mathbf{\Pi}}_m \right\rVert_{\text{F}}^2\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{R^{(t)}}\)</span> is the <span class="math notranslate nohighlight">\(N \times N\)</span> channel time
+covariance matrix,
+<span class="math notranslate nohighlight">\(\tilde{\mathbf{\Pi}}_m\)</span> the <span class="math notranslate nohighlight">\(N \times L_m\)</span> matrix that
+spreads <span class="math notranslate nohighlight">\(L_m\)</span> values to a vector of size <span class="math notranslate nohighlight">\(N\)</span> according to the
+<code class="docutils literal notranslate"><span class="pre">pilot_pattern</span></code> for the <span class="math notranslate nohighlight">\(m^{\text{th}}\)</span> sub-carrier,
+and <span class="math notranslate nohighlight">\(\tilde{\mathbf{\Sigma}}^{(2)}_m \in \mathbb{R}^{L_m \times L_m}\)</span>
+is the diagonal matrix of channel estimation error variances
+built by gathering the error variances from
+(<span class="math notranslate nohighlight">\(\mathbf{\Sigma}^{(2)}_1,\dots,\mathbf{\Sigma}^{(2)}_N\)</span>)
+corresponding to resource elements carried by the <span class="math notranslate nohighlight">\(m^{\text{th}}\)</span>
+sub-carrier.
+Computation of <span class="math notranslate nohighlight">\(\bar{\mathbf{B}}_m\)</span> uses a diagonally loaded
+Cholesky factorization followed by triangular solves. The diagonal loading
+improves numerical stability for badly conditioned covariance matrices.</p>
+<p>The resulting channel estimate for the resource grid is</p>
+<div class="math notranslate nohighlight">
+\[\hat{\mathbf{H}}^{(3)} = \left[ \hat{\mathbf{h}}_1^{(3)} \dots \hat{\mathbf{h}}_M^{(3)} \right]\]</div>
+<p>The resulting channel estimation error variances are the diagonal
+coefficients of the matrices</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{\Sigma}^{(3)}_m = \mathbf{R^{(t)}} - \mathbf{B}_m \tilde{\mathbf{\Xi}}_m \mathbf{R^{(t)}}, 1 \leq m \leq M\]</div>
+<p>where <span class="math notranslate nohighlight">\(\tilde{\mathbf{\Xi}}_m\)</span> is the diagonal matrix of size
+<span class="math notranslate nohighlight">\(N \times N\)</span> that zeros the columns corresponding to OFDM symbols
+not carrying any pilots.</p>
+<p><strong>Remark</strong>: The filter matrix differs across sub-carriers as
+different sub-carriers may have different estimation error variances
+computed by the first pass.
+However, all sub-carriers carry at least one channel estimate as a result
+of the first pass, ensuring that a channel estimate is computed for all the
+resource elements after the second pass.</p>
+<p><strong>Remark:</strong> LMMSE filtering requires knowledge of the time and
+frequency covariance matrices of the channel.
+The functions <a class="reference internal" href="../../../../../phy/api/ofdm/sionna.phy.ofdm.tdl_time_cov_mat.html#sionna.phy.ofdm.tdl_time_cov_mat" title="sionna.phy.ofdm.tdl_time_cov_mat"><code class="xref py py-func docutils literal notranslate"><span class="pre">tdl_time_cov_mat()</span></code></a>
+and <a class="reference internal" href="../../../../../phy/api/ofdm/sionna.phy.ofdm.tdl_freq_cov_mat.html#sionna.phy.ofdm.tdl_freq_cov_mat" title="sionna.phy.ofdm.tdl_freq_cov_mat"><code class="xref py py-func docutils literal notranslate"><span class="pre">tdl_freq_cov_mat()</span></code></a> compute the expected time
+and frequency covariance matrices, respectively, for the
+<a class="reference internal" href="../../../../../phy/api/channel/wireless/sionna.phy.channel.tr38901.TDL.html#sionna.phy.channel.tr38901.TDL" title="sionna.phy.channel.tr38901.TDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">TDL</span></code></a> channel models.</p>
+<p>Scaling of the estimates is then performed to ensure that their
+variances match the ones expected by the next smoothing step, and the
+error variances are updated accordingly:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+    \left[\hat{\mathbf{h}}_m^{(4)}\right]_n &amp;= \gamma_{m,n} \left[\hat{\mathbf{h}}_m^{(3)}\right]_n\\
+    \left[\mathbf{\Sigma}^{(4)}_m\right]_{n,n}  &amp;= \gamma_{m,n}\left( \gamma_{m,n}-1 \right) \left[\hat{\mathbf{\Sigma}}^{(3)}_m\right]_{n,n} + \left( 1 - \gamma_{m,n} \right) \left[\mathbf{R^{(t)}}\right]_{n,n} + \gamma_{m,n} \left[\mathbf{\Sigma}^{(3)}_n\right]_{m,m}
+\end{aligned}\end{split}\]</div>
+<p>where:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+    \gamma_{m,n} &amp;= \frac{2 \left[\mathbf{R^{(t)}}\right]_{n,n}}{\left[\mathbf{R^{(t)}}\right]_{n,n} - \left[\mathbf{\Sigma}^{(3)}_m\right]_{n,n} + \left[\hat{\mathbf{\Sigma}}^{(3)}_n\right]_{m,m}}\\
+    \hat{\mathbf{\Sigma}}^{(3)}_m &amp;= \mathbf{B}_m \mathbf{R^{(t)}} \mathbf{B}_m^{\mathrm{H}}
+\end{aligned}\end{split}\]</div>
+<p>Finally, if requested, a spatial smoothing step is applied to every resource element
+carrying a channel estimate.
+For clarity, we drop the resource element indexing <span class="math notranslate nohighlight">\((n,m)\)</span>.
+We denote by <span class="math notranslate nohighlight">\(L\)</span> the number of receive antennas, and by
+<span class="math notranslate nohighlight">\(\mathbf{R^{(s)}}\in\mathbb{C}^{L \times L}\)</span> the spatial covariance
+matrix.</p>
+<p>LMMSE spatial smoothing consists in the following computations:</p>
+<div class="math notranslate nohighlight">
+\[\hat{\mathbf{h}}^{(5)} = \mathbf{C} \hat{\mathbf{h}}^{(4)}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{C} = \mathbf{R^{(s)}} \left( \mathbf{R^{(s)}} + \mathbf{\Sigma}^{(4)} \right)^{-1}.\]</div>
+<p>The estimation error variances are the diagonal coefficients of</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{\Sigma}^{(5)} = \mathbf{R^{(s)}} - \mathbf{C}\mathbf{R^{(s)}}\]</div>
+<p>The smoothed channel estimate <span class="math notranslate nohighlight">\(\hat{\mathbf{h}}^{(5)}\)</span> and
+corresponding error variances
+<span class="math notranslate nohighlight">\(\text{diag}\left( \mathbf{\Sigma}^{(5)} \right)\)</span> are
+returned for every resource element <span class="math notranslate nohighlight">\((m,n)\)</span>.</p>
+<p><strong>Remark:</strong> No scaling is performed after the last filtering step.</p>
+<p><strong>Remark:</strong> All passes assume that the estimation error covariance matrix
+(<span class="math notranslate nohighlight">\(\mathbf{\Sigma}\)</span>,
+<span class="math notranslate nohighlight">\(\tilde{\mathbf{\Sigma}}^{(2)}\)</span>, or
+<span class="math notranslate nohighlight">\(\tilde{\mathbf{\Sigma}}^{(4)}\)</span>) is diagonal, which
+may not be accurate. When this assumption does not hold, this estimator
+is only an approximation of LMMSE estimation.</p>
+<p><strong>Remark:</strong> The order in which frequency filtering, temporal
+filtering, and, optionally, spatial smoothing are applied, is
+controlled using the <code class="docutils literal notranslate"><span class="pre">order</span></code> parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_grid</strong> (<a class="reference internal" href="../../../../../phy/api/ofdm/sionna.phy.ofdm.ResourceGrid.html#sionna.phy.ofdm.ResourceGrid" title="sionna.phy.ofdm.resource_grid.ResourceGrid"><em>sionna.phy.ofdm.resource_grid.ResourceGrid</em></a>) – Used resource grid.</p></li>
+<li><p><strong>cov_mat_time</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><em>torch.Tensor</em></a>) – Time covariance matrix of the channel.</p></li>
+<li><p><strong>cov_mat_freq</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><em>torch.Tensor</em></a>) – Frequency covariance matrix of the channel.</p></li>
+<li><p><strong>cov_mat_space</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><em>torch.Tensor</em></a><em> | </em><em>None</em>) – Spatial covariance matrix of the channel.
+Only required if spatial smoothing is requested (see <code class="docutils literal notranslate"><span class="pre">order</span></code>).</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>) – Order in which to perform filtering.
+For example, <code class="docutils literal notranslate"><span class="pre">&quot;t-f-s&quot;</span></code> means that filtering across
+the OFDM symbols is performed first (<code class="docutils literal notranslate"><span class="pre">&quot;t&quot;</span></code>: time), followed by
+filtering across the sub-carriers (<code class="docutils literal notranslate"><span class="pre">&quot;f&quot;</span></code>: frequency), and
+filtering across the receive antennas (<code class="docutils literal notranslate"><span class="pre">&quot;s&quot;</span></code>: space).
+Similarly, <code class="docutils literal notranslate"><span class="pre">&quot;f-t&quot;</span></code> means filtering across the sub-carriers
+followed by filtering across the OFDM symbols, and no spatial
+filtering. The spatial covariance matrix (<code class="docutils literal notranslate"><span class="pre">cov_mat_space</span></code>) is
+only required when spatial filtering is requested. Time and frequency
+filtering are not optional to ensure that a channel estimate is
+computed for all resource elements.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Inputs<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>y</strong> – [batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size], <cite>torch.complex</cite>.
+Observed resource grid.</p></li>
+<li><p><strong>no</strong> – [batch_size, num_rx, num_rx_ant] or only the first n&gt;=0 dims, <cite>torch.float</cite>.
+Variance of the AWGN.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Outputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h_hat</strong> – [batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], <cite>torch.complex</cite>.
+Channel estimates across the entire resource grid for all
+transmitters and streams.</p></li>
+<li><p><strong>err_var</strong> – Same shape as <code class="docutils literal notranslate"><span class="pre">h_hat</span></code>, <cite>torch.float</cite>.
+Channel estimation error variances across the entire resource grid
+for all transmitters and streams.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.ofdm</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ResourceGrid</span><span class="p">,</span> <span class="n">LMMSEChannelEstimator</span><span class="p">,</span>
+    <span class="n">tdl_freq_cov_mat</span><span class="p">,</span> <span class="n">tdl_time_cov_mat</span>
+<span class="p">)</span>
+
+<span class="n">rg</span> <span class="o">=</span> <span class="n">ResourceGrid</span><span class="p">(</span><span class="n">num_ofdm_symbols</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+                  <span class="n">fft_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+                  <span class="n">subcarrier_spacing</span><span class="o">=</span><span class="mf">30e3</span><span class="p">,</span>
+                  <span class="n">num_tx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                  <span class="n">num_streams_per_tx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                  <span class="n">pilot_pattern</span><span class="o">=</span><span class="s2">"kronecker"</span><span class="p">,</span>
+                  <span class="n">pilot_ofdm_symbol_indices</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">])</span>
+
+<span class="c1"># Compute covariance matrices</span>
+<span class="n">cov_mat_freq</span> <span class="o">=</span> <span class="n">tdl_freq_cov_mat</span><span class="p">(</span><span class="s2">"A"</span><span class="p">,</span> <span class="mf">30e3</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mf">100e-9</span><span class="p">)</span>
+<span class="n">cov_mat_time</span> <span class="o">=</span> <span class="n">tdl_time_cov_mat</span><span class="p">(</span><span class="s2">"A"</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.5e9</span><span class="p">,</span> <span class="mf">35.7e-6</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+
+<span class="c1"># Create LMMSE channel estimator</span>
+<span class="n">estimator</span> <span class="o">=</span> <span class="n">LMMSEChannelEstimator</span><span class="p">(</span>
+    <span class="n">rg</span><span class="p">,</span> <span class="n">cov_mat_time</span><span class="p">,</span> <span class="n">cov_mat_freq</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">"f-t"</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Methods</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.15)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../../_modules/sionna/phy/ofdm/channel_estimation.html#LMMSEChannelEstimator.call"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Estimate the channel.</p>
+<p>This is an abstract method that must be implemented by a concrete
+OFDM channel estimator that implements this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><em>torch.Tensor</em></a>) – [batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size], <cite>torch.complex</cite>.
+Observed signals.</p></li>
+<li><p><strong>no</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><em>torch.Tensor</em></a>) – [batch_size, num_rx, num_rx_ant] or only the first n&gt;=0 dims, <cite>torch.float</cite>.
+Variance of the AWGN.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>h_hat</strong> – [batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], <cite>torch.complex</cite>.
+Channel estimates across the entire resource grid for all
+transmitters and streams.</p></li>
+<li><p><strong>err_var</strong> – Same shape as <code class="docutils literal notranslate"><span class="pre">h_hat</span></code>, <cite>torch.float</cite>.
+Channel estimation error variance across the entire resource grid
+for all transmitters and streams.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="module-sionna.bench.mimo_ofdm_chest.papers.builtin.asset">
+<span id="covariance-estimation"></span><h2>Covariance Estimation<a class="headerlink" href="#module-sionna.bench.mimo_ofdm_chest.papers.builtin.asset" title="Link to this heading">#</a></h2>
+<p>Persistent covariance assets for Sionna’s built-in LMMSE estimator.</p>
+<p>Follows the recipe in OFDM_MIMO_Detection.ipynb:
+samples single-UE channel frequency responses from UMi under random topology,
+accumulates H·H^H across the relevant dimension, and averages. The resulting
+covariance matrices are passed to <cite>LMMSEChannelEstimator(order=’t-f-s’)</cite>.</p>
+<p>The covariances depend on the BS/UE arrays and the UMi config. Optional
+package-local assets live below this module’s <code class="docutils literal notranslate"><span class="pre">assets/</span></code> directory; generated
+assets live below an explicit external asset root.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.bench.mimo_ofdm_chest.papers.builtin.asset.estimate_covariance">
+<span class="sig-prename descclassname"><span class="pre">sionna.bench.mimo_ofdm_chest.papers.builtin.asset.</span></span><span class="sig-name descname"><span class="pre">estimate_covariance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">sionna.bench.mimo_ofdm_chest.configs.system_config.SystemConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_it</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">asset_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><span class="pre">pathlib.Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.15)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.15)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../../_modules/sionna/bench/mimo_ofdm_chest/papers/builtin/asset.html#estimate_covariance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.bench.mimo_ofdm_chest.papers.builtin.asset.estimate_covariance" title="Link to this definition">#</a></dt>
+<dd><p>Estimate and persist covariance matrices under an external asset root.</p>
+<p>The payload and manifest are first written to a temporary sibling
+directory. The completed directory is then published and reloaded through
+<code class="xref py py-func docutils literal notranslate"><span class="pre">load_covariance()</span></code>, so generated and package-local assets follow the
+same validation path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cfg</strong> (<em>sionna.bench.mimo_ofdm_chest.configs.system_config.SystemConfig</em>) – System configuration defining channel, grid, and array
+compatibility.</p></li>
+<li><p><strong>num_it</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – Number of Monte Carlo channel batches used for estimation.</p></li>
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – Number of channel realizations in each batch.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em> | </em><em>None</em>) – Explicit generation seed. Defaults to <code class="docutils literal notranslate"><span class="pre">cfg.seed</span></code>.</p></li>
+<li><p><strong>asset_root</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><em>pathlib.Path</em></a>) – Explicit external writable asset root.</p></li>
+<li><p><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>) – If <cite>True</cite>, replace an existing selected asset.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Reloaded covariance matrices and their <code class="docutils literal notranslate"><span class="pre">manifest.json</span></code> path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="sionna.phy.ofdm.LSChannelEstimator.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">LSChannelEstimator</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="sionna.bench.mimo_ofdm_chest.papers.edfors1996.TruncatedChannelEstimator.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">TruncatedChannelEstimator</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sionna.bench.mimo_ofdm_chest.papers.builtin.asset">Covariance Estimation</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.bench.mimo_ofdm_chest.papers.builtin.asset.estimate_covariance"><code class="docutils literal notranslate"><span class="pre">estimate_covariance()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../../../_sources/bench/benchmarks/mimo_ofdm_chest/estimators/linear/sionna.phy.ofdm.LMMSEChannelEstimator.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

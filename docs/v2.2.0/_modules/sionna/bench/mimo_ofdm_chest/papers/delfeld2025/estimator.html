@@ -1,0 +1,1368 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sionna.bench.mimo_ofdm_chest.papers.delfeld2025.estimator &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css?v=cffce40c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/leaderboard/styles.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../../../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sionna/bench/mimo_ofdm_chest/papers/delfeld2025/estimator';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <script type="module" src="../../../../../../_static/leaderboard/app.js"></script>
+    <link rel="canonical" href="/sionna/_modules/sionna/bench/mimo_ofdm_chest/papers/delfeld2025/estimator.html" />
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../../../../../../_static/searchtools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    <script src="../../../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../bench/index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../bench/index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sionna.bench.mimo_ofdm_chest.papers.delfeld2025.estimator</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sionna.bench.mimo_ofdm_chest.papers.delfeld2025.estimator</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+
+<span class="sd">"""Full-grid RKHS estimator for Delfeld et al., 2025.</span>
+
+<span class="sd">This implements the paper's low-rank RKHS denoising, forward-backward</span>
+<span class="sd">splitting, debiasing, and RKHS function evaluation at all configured</span>
+<span class="sd">subcarrier frequencies from Sionna's extracted pilot measurements. Completion</span>
+<span class="sd">across OFDM symbols is handled by the repository's time-domain interpolator.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Precision</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.ofdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseChannelEstimator</span><span class="p">,</span> <span class="n">LSChannelEstimator</span><span class="p">,</span> <span class="n">ResourceGrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.ofdm.channel_estimation</span><span class="w"> </span><span class="kn">import</span> <span class="n">_PilotGroupMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_last_dims</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.bench.mimo_ofdm_chest.time_domain_interpolator</span><span class="w"> </span><span class="kn">import</span> <span class="n">TimeDomainInterpolator</span>
+
+
+<div class="viewcode-block" id="RKHSChannelEstimator">
+<a class="viewcode-back" href="../../../../../../bench/benchmarks/mimo_ofdm_chest/estimators/sparse/sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator.html#sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RKHSChannelEstimator</span><span class="p">(</span><span class="n">BaseChannelEstimator</span><span class="p">,</span> <span class="n">_PilotGroupMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Channel estimator that leverages sparsity through RKHS regularization.</span>
+
+<span class="sd">        This implementation follows Algorithm 1 proposed in:</span>
+
+<span class="sd">        .. container:: bibliography-box</span>
+
+<span class="sd">           .. bibliography::</span>
+<span class="sd">              :filter: key == "delfeld2025sparse"</span>
+<span class="sd">              :list: bullet</span>
+
+<span class="sd">        .. rubric:: TL;DR</span>
+
+<span class="sd">        The estimator solves a low-dimensional surrogate of an optimization problem</span>
+<span class="sd">        derived through Reproducing Kernel Hilbert Space (RKHS) theory.</span>
+<span class="sd">        The solver uses forward-backward splitting with two stages: a regularized stage</span>
+<span class="sd">        that identifies the channel's support, and a debiasing stage that</span>
+<span class="sd">        reconstructs the channel within the support using Tikhonov regularization.</span>
+
+<span class="sd">        The channel estimator exploits sparsity in the beamspace and the delay domain.</span>
+<span class="sd">        The channel is estimated independently for each pilot-bearing OFDM symbol,</span>
+<span class="sd">        and a ``TimeDomainInterpolator`` is used to complete the channel estimate across</span>
+<span class="sd">        OFDM symbols.</span>
+
+<span class="sd">        .. rubric:: Supported System Geometry</span>
+
+<span class="sd">        The estimator supports different FFT sizes, UE counts, pilot-bearing OFDM symbol</span>
+<span class="sd">        positions, and rectangular receive antenna arrays, provided that the following hold:</span>
+
+<span class="sd">        - Each pilot group is a uniform comb over subcarriers with at least two non-zero pilots.</span>
+<span class="sd">        - All pilot groups have the same length.</span>
+<span class="sd">        - Every stream has the same number of active pilot-bearing OFDM symbols.</span>
+<span class="sd">        - ``num_rows * num_cols`` matches the receive-antenna dimension.</span>
+
+<span class="sd">        .. rubric:: Deviations from the Paper</span>
+
+<span class="sd">        - The default number of iterations and the regularization weights were selected</span>
+<span class="sd">          using Optuna, rather than following the paper's specified values.</span>
+<span class="sd">        - The paper does not specify detector-facing error variances, so the implementation</span>
+<span class="sd">          returns ``err_var_scale * no``, where the default value of ``err_var_scale`` was</span>
+<span class="sd">          selected using Optuna.</span>
+
+<span class="sd">        :param resource_grid: Sionna resource grid defining the pilot pattern.</span>
+<span class="sd">        :param num_rows: Number of rows in the base-station antenna grid.</span>
+<span class="sd">            ``num_rows*num_cols`` must match the receive-antenna dimension.</span>
+<span class="sd">        :param num_cols: Number of columns in the base-station antenna grid.</span>
+<span class="sd">        :param rank: Low-rank RKHS approximation rank per frequency/row/column</span>
+<span class="sd">            dimension. The rank is clipped independently to each available</span>
+<span class="sd">            dimension size.</span>
+<span class="sd">        :param sparse_num_iter: Number of sparse optimization iterations using</span>
+<span class="sd">            gradient steps and group soft-thresholding.</span>
+<span class="sd">        :param debias_num_iter: Number of support-constrained debiasing</span>
+<span class="sd">            iterations after sparse support extraction.</span>
+<span class="sd">        :param step_size: Forward-backward splitting step size.</span>
+<span class="sd">        :param lambda_scale: Scale applied to the paper's</span>
+<span class="sd">            ``sqrt(noise variance)`` sparse regularization weight.</span>
+<span class="sd">        :param debias_scale: Scale applied to the debiasing Tikhonov weight.</span>
+<span class="sd">        :param err_var_scale: Nonnegative multiplicative scale applied to the LS pilot</span>
+<span class="sd">            error variances before interpolation.</span>
+<span class="sd">        :param time_avg: If `True`, average estimates from all pilot-bearing</span>
+<span class="sd">            OFDM symbols and repeat the mean over every OFDM symbol. If</span>
+<span class="sd">            `False`, interpolate linearly across OFDM symbols and extrapolate</span>
+<span class="sd">            outside the first and last pilot-bearing symbols.</span>
+<span class="sd">        :param precision: Optional Sionna precision setting.</span>
+<span class="sd">        :param device: Optional torch device for Sionna buffers.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource_grid</span><span class="p">:</span> <span class="n">ResourceGrid</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">num_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">num_cols</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">sparse_num_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">19</span><span class="p">,</span>
+        <span class="n">debias_num_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.57</span><span class="p">,</span>
+        <span class="n">lambda_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">58.3</span><span class="p">,</span>
+        <span class="n">debias_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.00115</span><span class="p">,</span>
+        <span class="n">err_var_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.00102</span><span class="p">,</span>
+        <span class="n">time_avg</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Initialize the full-grid RKHS channel estimator."""</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_rows</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">num_rows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"`num_rows` must be a positive integer."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_cols</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">num_cols</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"`num_cols` must be a positive integer."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">rank</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"`rank` must be a positive integer."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sparse_num_iter</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sparse_num_iter</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"`sparse_num_iter` must be a non-negative integer."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">debias_num_iter</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">debias_num_iter</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"`debias_num_iter` must be a non-negative integer."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step_size</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">step_size</span><span class="p">),</span> <span class="p">(</span>
+            <span class="s2">"`step_size` must be finite."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">step_size</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"`step_size` must be positive."</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lambda_scale</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">lambda_scale</span><span class="p">),</span> <span class="p">(</span>
+            <span class="s2">"`lambda_scale` must be finite."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">lambda_scale</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"`lambda_scale` must be non-negative."</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">debias_scale</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">debias_scale</span><span class="p">),</span> <span class="p">(</span>
+            <span class="s2">"`debias_scale` must be finite."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">debias_scale</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"`debias_scale` must be non-negative."</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">err_var_scale</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span>
+            <span class="n">err_var_scale</span>
+        <span class="p">),</span> <span class="s2">"`err_var_scale` must be finite."</span>
+        <span class="k">assert</span> <span class="n">err_var_scale</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"`err_var_scale` must be non-negative."</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_avg</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">"`time_avg` must be boolean."</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">resource_grid</span><span class="o">=</span><span class="n">resource_grid</span><span class="p">,</span>
+            <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span> <span class="o">=</span> <span class="n">num_rows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span> <span class="o">=</span> <span class="n">num_cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_rx_ant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="o">.</span><span class="n">num_tx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_streams_per_tx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="o">.</span><span class="n">num_streams_per_tx</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rank</span> <span class="o">=</span> <span class="n">rank</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_num_iter</span> <span class="o">=</span> <span class="n">sparse_num_iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debias_num_iter</span> <span class="o">=</span> <span class="n">debias_num_iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_step_size</span> <span class="o">=</span> <span class="n">step_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_effective_subcarriers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">resource_grid</span><span class="o">.</span><span class="n">num_effective_subcarriers</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Tuned constants for the current pilot-domain adaptation. The paper</span>
+        <span class="c1"># uses a sqrt(noise variance) sparse penalty; the scale below accounts</span>
+        <span class="c1"># for the unitary FFT convention and benchmark normalization.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_scale</span> <span class="o">=</span> <span class="n">lambda_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debias_scale</span> <span class="o">=</span> <span class="n">debias_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_err_var_scale</span> <span class="o">=</span> <span class="n">err_var_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_pilot_groups</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="p">,</span> <span class="n">group_over</span><span class="o">=</span><span class="p">(</span><span class="s2">"subcarrier"</span><span class="p">,))</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_len</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"RKHS full-frequency evaluation requires at least two pilot "</span>
+            <span class="s2">"subcarriers per group."</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_pilot_symbol_groups</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_time_interpolator</span> <span class="o">=</span> <span class="n">TimeDomainInterpolator</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="p">,</span>
+            <span class="n">time_avg</span><span class="o">=</span><span class="n">time_avg</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">num_pilot_subcarriers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_len</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_subcarrier_rank</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_row_rank</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_column_rank</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rank</span><span class="p">,</span> <span class="n">dimension_size</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dimension_size</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">num_pilot_subcarriers</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">low_rank_factors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Build the paper's low-rank RKHS basis factors over pilot frequency,</span>
+        <span class="c1"># array row, and array column coordinates.</span>
+        <span class="k">for</span> <span class="n">dim_size</span><span class="p">,</span> <span class="n">effective_rank</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">num_pilot_subcarriers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span><span class="p">),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subcarrier_rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_row_rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_column_rank</span><span class="p">),</span>
+        <span class="p">):</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">dim_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_ind</span><span class="o">.</span><span class="n">device</span>
+            <span class="p">)</span>
+            <span class="n">kernel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sinc</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">indices</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">indices</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">dim_size</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
+            <span class="n">dominant_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">eigenvalues</span><span class="p">,</span> <span class="n">descending</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span>
+                <span class="p">:</span><span class="n">effective_rank</span>
+            <span class="p">]</span>
+            <span class="n">eigenvalues</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">eigenvalues</span><span class="p">[</span><span class="n">dominant_indices</span><span class="p">],</span> <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">low_rank_factors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">eigenvectors</span><span class="p">[:,</span> <span class="n">dominant_indices</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdtype</span><span class="p">),</span>
+                    <span class="n">eigenvalues</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">subcarrier_eigenvectors</span><span class="p">,</span> <span class="n">subcarrier_eigenvalues</span> <span class="o">=</span> <span class="n">low_rank_factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">row_factor</span> <span class="o">=</span> <span class="n">low_rank_factors</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="n">low_rank_factors</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdtype</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">column_factor</span> <span class="o">=</span> <span class="n">low_rank_factors</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="n">low_rank_factors</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdtype</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">subcarrier_factor</span> <span class="o">=</span> <span class="n">subcarrier_eigenvectors</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="n">subcarrier_eigenvalues</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdtype</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">rkhs_basis_pilot</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">subcarrier_factor</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="o">*</span> <span class="n">row_factor</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="o">*</span> <span class="n">column_factor</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="n">num_pilot_subcarriers</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_subcarrier_rank</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_row_rank</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_column_rank</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">"_rkhs_basis_pilot"</span><span class="p">,</span> <span class="n">rkhs_basis_pilot</span><span class="p">)</span>
+
+        <span class="n">full_subcarrier_factors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_full_subcarrier_factors</span><span class="p">(</span>
+            <span class="n">subcarrier_eigenvectors</span><span class="p">,</span>
+            <span class="n">subcarrier_eigenvalues</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">rkhs_basis_full</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">full_subcarrier_factors</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="o">*</span> <span class="n">row_factor</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="o">*</span> <span class="n">column_factor</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_num_groups</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_effective_subcarriers</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_subcarrier_rank</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_row_rank</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_column_rank</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">"_rkhs_basis_full"</span><span class="p">,</span> <span class="n">rkhs_basis_full</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span>
+            <span class="s2">"_full_subcarrier_transform"</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_build_full_subcarrier_transform</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">dim_name</span><span class="p">,</span> <span class="n">dim_size</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s2">"subcarrier"</span><span class="p">,</span> <span class="n">num_pilot_subcarriers</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">"row"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">"column"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span><span class="p">),</span>
+        <span class="p">):</span>
+            <span class="n">measurement_phase</span><span class="p">,</span> <span class="n">atom_phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_center_phases</span><span class="p">(</span>
+                <span class="n">dim_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_ind</span><span class="o">.</span><span class="n">device</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="sa">f</span><span class="s2">"_measurement_phase_</span><span class="si">{</span><span class="n">dim_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">measurement_phase</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="sa">f</span><span class="s2">"_atom_phase_</span><span class="si">{</span><span class="n">dim_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">atom_phase</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RKHSChannelEstimator.call">
+<a class="viewcode-back" href="../../../../../../bench/benchmarks/mimo_ofdm_chest/estimators/sparse/sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator.html#sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator.call">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">call</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">no</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Estimate the full effective resource-grid channel.</span>
+
+<span class="sd">        :input y: [batch, num_rx, num_rx_ant, num_ofdm_symbols, fft_size],</span>
+<span class="sd">            `torch.complex`. Received OFDM resource grid.</span>
+<span class="sd">        :input no: `torch.float`. Noise variance with a Sionna-compatible</span>
+<span class="sd">            broadcast shape.</span>
+
+<span class="sd">        :output h_hat: [batch, num_rx, num_rx_ant, num_tx,</span>
+<span class="sd">            num_streams_per_tx, num_ofdm_symbols,</span>
+<span class="sd">            num_effective_subcarriers], `torch.complex`. Channel estimates.</span>
+<span class="sd">        :output err_var: Same shape as ``h_hat``, `torch.float`.</span>
+<span class="sd">            Detector-facing channel-estimation error variances.</span>
+<span class="sd">        """</span>
+        <span class="n">y_eff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_nulled_scs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">y_eff_flat</span> <span class="o">=</span> <span class="n">flatten_last_dims</span><span class="p">(</span><span class="n">y_eff</span><span class="p">)</span>
+
+        <span class="n">pilot_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_ind</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">pilot_ind</span> <span class="o">=</span> <span class="n">pilot_ind</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+            <span class="n">y_eff_flat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">y_eff_flat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">y_eff_flat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">y_pilots</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="n">y_eff_flat</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">pilot_ind</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">pilot_ind</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">pilot_ind</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">h_hat</span><span class="p">,</span> <span class="n">err_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_pilot_symbol_subcarriers</span><span class="p">(</span><span class="n">y_pilots</span><span class="p">,</span> <span class="n">no</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_interpolator</span><span class="p">(</span><span class="n">h_hat</span><span class="p">,</span> <span class="n">err_var</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_estimate_pilot_symbol_subcarriers</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">y_pilots</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">no</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Evaluate the RKHS channel on all subcarriers of pilot symbols.</span>
+
+<span class="sd">        Sionna compact pilots are first converted to LS observations. For each</span>
+<span class="sd">        ``(tx, stream, pilot OFDM symbol)`` group, the paper's sparse RKHS</span>
+<span class="sd">        optimization is solved on the pilot comb and the recovered function is</span>
+<span class="sd">        then evaluated at all effective subcarrier frequencies with ``S(F)``.</span>
+
+<span class="sd">        :param y_pilots: Received pilot observations gathered by Sionna.</span>
+<span class="sd">        :param no: Noise variance with Sionna-compatible broadcast shape.</span>
+
+<span class="sd">        :returns: Channel estimates and error variances with shape</span>
+<span class="sd">            ``[batch, num_rx, num_rx_ant, num_tx, num_streams,</span>
+<span class="sd">            num_pilot_ofdm_symbols, num_effective_subcarriers]``.</span>
+<span class="sd">        """</span>
+        <span class="n">no</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">no</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">y_pilots</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">h_ls</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">LSChannelEstimator</span><span class="o">.</span><span class="n">estimate_at_pilot_locations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_pilots</span><span class="p">,</span> <span class="n">no</span><span class="p">)</span>
+
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">h_ls</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">num_rx</span> <span class="o">=</span> <span class="n">h_ls</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">h_ls</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rx_ant</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"`num_rows*num_cols` must match the receive-antenna dimension."</span>
+        <span class="p">)</span>
+        <span class="n">noise_variance_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expand_noise_variance_grid</span><span class="p">(</span>
+            <span class="n">no</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">num_rx</span>
+        <span class="p">)</span>
+        <span class="n">clamped_noise_variance_grid</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">noise_variance_grid</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">)</span>
+
+        <span class="n">h_ls_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gather_pilot_groups</span><span class="p">(</span><span class="n">h_ls</span><span class="p">)</span>
+        <span class="n">err_var_group</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_err_var_scale</span>
+            <span class="o">*</span> <span class="n">noise_variance_grid</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                <span class="n">batch_size</span><span class="p">,</span> <span class="n">num_rx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rx_ant</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># [B, num_rx, antennas, groups, pilot_sc] -&gt;</span>
+        <span class="c1"># [B, num_rx, groups, pilot_sc, rows, cols].</span>
+        <span class="n">h_ls_grid</span> <span class="o">=</span> <span class="n">h_ls_groups</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">num_rx</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_num_groups</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_len</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+
+        <span class="n">coefficients</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_measurement_adjoint</span><span class="p">(</span><span class="n">h_ls_grid</span><span class="p">)</span>
+        <span class="n">num_measurements</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_len</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span>
+        <span class="p">)</span>
+        <span class="n">regularization_weight</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_scale</span>
+            <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">clamped_noise_variance_grid</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">num_measurements</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">coefficients</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_optimization</span><span class="p">(</span>
+            <span class="n">coefficients</span><span class="p">,</span>
+            <span class="n">h_ls_grid</span><span class="p">,</span>
+            <span class="n">regularization_weight</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">debias_weight</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_debias_scale</span>
+            <span class="o">*</span> <span class="n">clamped_noise_variance_grid</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">coefficients</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debias_coefficients</span><span class="p">(</span>
+            <span class="n">coefficients</span><span class="p">,</span>
+            <span class="n">h_ls_grid</span><span class="p">,</span>
+            <span class="n">debias_weight</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">h_hat_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_full_subcarrier_operator</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span>
+        <span class="n">h_hat_groups</span> <span class="o">=</span> <span class="n">h_hat_groups</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">num_rx</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_rx_ant</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_num_groups</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_effective_subcarriers</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">err_var_groups</span> <span class="o">=</span> <span class="n">err_var_group</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_num_groups</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_effective_subcarriers</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">h_hat_pilot_symbols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scatter_full_subcarrier_groups</span><span class="p">(</span><span class="n">h_hat_groups</span><span class="p">)</span>
+        <span class="n">err_var_pilot_symbols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scatter_full_subcarrier_groups</span><span class="p">(</span>
+            <span class="n">err_var_groups</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">h_hat_pilot_symbols</span><span class="p">,</span> <span class="n">err_var_pilot_symbols</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_measurement_operator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">coefficients</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Apply the paper's low-rank pilot measurement operator ``S``."""</span>
+        <span class="n">transformed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centered_fourier</span><span class="p">(</span>
+            <span class="n">coefficients</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">rkhs_basis_pilot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rkhs_basis_pilot</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">transformed</span> <span class="o">*</span> <span class="n">rkhs_basis_pilot</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_full_subcarrier_operator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">coefficients</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Evaluate ``S(F)`` for all pilot groups (Algorithm 1 line 15)."""</span>
+        <span class="n">transformed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centered_fourier_full_subcarriers</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span>
+        <span class="n">rkhs_basis_full</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rkhs_basis_full</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">transformed</span> <span class="o">*</span> <span class="n">rkhs_basis_full</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_measurement_adjoint</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">residual</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Apply the adjoint low-rank pilot operator ``S^H``."""</span>
+        <span class="n">rkhs_basis_pilot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rkhs_basis_pilot</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">lifted</span> <span class="o">=</span> <span class="n">residual</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">rkhs_basis_pilot</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centered_fourier_adjoint</span><span class="p">(</span>
+            <span class="n">lifted</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_scatter_full_subcarrier_groups</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">grouped_values</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Scatter full-subcarrier groups into compact pilot-symbol slots."""</span>
+        <span class="n">leading_shape</span> <span class="o">=</span> <span class="n">grouped_values</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">flat_num_slots</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_streams_per_tx</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilot_symbol_groups_per_stream</span>
+        <span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="o">*</span><span class="n">leading_shape</span><span class="p">,</span>
+            <span class="n">flat_num_slots</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_effective_subcarriers</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">grouped_values</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">grouped_values</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">index_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">leading_shape</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_num_groups</span><span class="p">,</span>
+            <span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_pilot_symbol_flat_index</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="n">index_shape</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">expand_as</span><span class="p">(</span><span class="n">grouped_values</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">grouped_values</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="o">*</span><span class="n">leading_shape</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_streams_per_tx</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilot_symbol_groups_per_stream</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_effective_subcarriers</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sparse_optimization</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">coefficients</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">regularization_weight</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Run Algorithm 1's sparse FBS and group-thresholding iterations."""</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sparse_num_iter</span><span class="p">):</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_measurement_operator</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span> <span class="o">-</span> <span class="n">observations</span>
+            <span class="n">gradient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_measurement_adjoint</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
+            <span class="n">descent_step</span> <span class="o">=</span> <span class="n">coefficients</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step_size</span> <span class="o">*</span> <span class="n">gradient</span>
+            <span class="n">group_norm</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">descent_step</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">square</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">shrinkage_factor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+                <span class="mf">1.0</span>
+                <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_step_size</span> <span class="o">*</span> <span class="n">regularization_weight</span><span class="p">)</span>
+                <span class="o">/</span> <span class="p">(</span><span class="n">group_norm</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">),</span>
+                <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">coefficients</span> <span class="o">=</span> <span class="n">descent_step</span> <span class="o">*</span> <span class="n">shrinkage_factor</span>
+        <span class="k">return</span> <span class="n">coefficients</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_debias_coefficients</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">coefficients</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">debias_weight</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Optimize the Tikhonov objective on the fixed sparse support."""</span>
+        <span class="n">active_support</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">coefficients</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">square</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_debias_num_iter</span><span class="p">):</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_measurement_operator</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span> <span class="o">-</span> <span class="n">observations</span>
+            <span class="n">gradient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_measurement_adjoint</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
+            <span class="n">gradient</span> <span class="o">=</span> <span class="n">gradient</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">debias_weight</span> <span class="o">*</span> <span class="n">coefficients</span>
+            <span class="n">coefficients</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="n">active_support</span><span class="p">,</span>
+                <span class="n">coefficients</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step_size</span> <span class="o">*</span> <span class="n">gradient</span><span class="p">,</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">coefficients</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">coefficients</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_pilot_symbol_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Register the per-group slot within each stream's pilot-symbol list."""</span>
+        <span class="n">tx_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_constant_coord</span><span class="p">(</span><span class="s2">"tx"</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+        <span class="n">stream_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_constant_coord</span><span class="p">(</span><span class="s2">"stream"</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+        <span class="n">symbol_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_constant_coord</span><span class="p">(</span><span class="s2">"symbol"</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+        <span class="n">slots</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_num_groups</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">num_slots</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">tx_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">stream_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_streams_per_tx</span><span class="p">):</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+                    <span class="n">tx_indices</span> <span class="o">==</span> <span class="n">tx_index</span><span class="p">,</span>
+                    <span class="n">stream_indices</span> <span class="o">==</span> <span class="n">stream_index</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">group_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="n">as_tuple</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="n">current_symbols</span> <span class="o">=</span> <span class="n">symbol_indices</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">group_indices</span><span class="p">)</span>
+                <span class="n">symbol_order</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">current_symbols</span><span class="p">)</span>
+                <span class="n">ordered_group_indices</span> <span class="o">=</span> <span class="n">group_indices</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">symbol_order</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">num_slots</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">num_slots</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ordered_group_indices</span><span class="o">.</span><span class="n">numel</span><span class="p">())</span>
+                <span class="k">assert</span> <span class="nb">int</span><span class="p">(</span><span class="n">ordered_group_indices</span><span class="o">.</span><span class="n">numel</span><span class="p">())</span> <span class="o">==</span> <span class="n">num_slots</span><span class="p">,</span> <span class="p">(</span>
+                    <span class="s2">"RKHS time interpolation requires the same number of "</span>
+                    <span class="s2">"pilot OFDM symbols for every stream."</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">slot</span><span class="p">,</span> <span class="n">group_index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ordered_group_indices</span><span class="o">.</span><span class="n">tolist</span><span class="p">()):</span>
+                    <span class="n">slots</span><span class="p">[</span><span class="n">group_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">slot</span>
+        <span class="k">assert</span> <span class="n">num_slots</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">num_slots</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"RKHS time interpolation requires at least one pilot OFDM symbol."</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilot_symbol_groups_per_stream</span> <span class="o">=</span> <span class="n">num_slots</span>
+        <span class="n">flat_indices</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">tx_indices</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_streams_per_tx</span> <span class="o">+</span> <span class="n">stream_indices</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">num_slots</span>
+            <span class="o">+</span> <span class="n">slots</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span>
+            <span class="s2">"_group_pilot_symbol_flat_index"</span><span class="p">,</span>
+            <span class="n">flat_indices</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_full_subcarrier_factors</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">subcarrier_eigenvectors</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">subcarrier_eigenvalues</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Build frequency cross-kernel factors for evaluating over ``F``."""</span>
+        <span class="n">pilot_positions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_len</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">target_positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_full_subcarrier_reduced_positions</span><span class="p">()</span>
+        <span class="n">cross_kernel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sinc</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">target_positions</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">pilot_positions</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:])</span>
+            <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_len</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">inverse_sqrt_eigenvalues</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rsqrt</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">subcarrier_eigenvalues</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">cross_kernel</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdtype</span><span class="p">),</span> <span class="n">subcarrier_eigenvectors</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">inverse_sqrt_eigenvalues</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_full_subcarrier_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return centered Fourier rows for all effective subcarriers."""</span>
+        <span class="n">source_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_len</span>
+        <span class="n">source_center</span> <span class="o">=</span> <span class="p">(</span><span class="n">source_size</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">source_positions</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">source_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="o">-</span> <span class="n">source_center</span>
+        <span class="p">)</span>
+        <span class="n">target_positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_full_subcarrier_reduced_positions</span><span class="p">()</span> <span class="o">-</span> <span class="n">source_center</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">2.0</span>
+            <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+            <span class="o">*</span> <span class="n">target_positions</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="o">*</span> <span class="n">source_positions</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">source_size</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">phase</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdtype</span><span class="p">))</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">source_size</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_full_subcarrier_reduced_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return all subcarriers in each pilot group's reduced comb units."""</span>
+        <span class="n">group_subcarrier_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_varying_coord</span><span class="p">(</span><span class="s2">"subcarrier"</span><span class="p">)</span>
+        <span class="n">subcarrier_spacings</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">group_subcarrier_indices</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">first_spacings</span> <span class="o">=</span> <span class="n">subcarrier_spacings</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">bool</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">subcarrier_spacings</span> <span class="o">==</span> <span class="n">first_spacings</span><span class="p">)),</span> <span class="p">(</span>
+            <span class="s2">"RKHS full-frequency evaluation requires uniform pilot combs."</span>
+        <span class="p">)</span>
+        <span class="n">group_spacings</span> <span class="o">=</span> <span class="n">first_spacings</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">group_offsets</span> <span class="o">=</span> <span class="n">group_subcarrier_indices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">target_subcarriers</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_effective_subcarriers</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">target_subcarriers</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">group_offsets</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">group_spacings</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_expand_noise_variance_grid</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">no</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_rx</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Expand noise variance to [batch, num_rx, 1, num_rows, num_cols]."""</span>
+        <span class="k">if</span> <span class="n">no</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">noise_variance_grid</span> <span class="o">=</span> <span class="n">no</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">no</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">),</span> <span class="p">(</span>
+                <span class="s2">"`no` has incompatible batch dimension."</span>
+            <span class="p">)</span>
+            <span class="n">noise_variance_grid</span> <span class="o">=</span> <span class="n">no</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">no</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span> <span class="ow">and</span> <span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_rx</span><span class="p">),</span> <span class="p">(</span>
+                <span class="s2">"`no` has incompatible batch or receiver dimension."</span>
+            <span class="p">)</span>
+            <span class="n">noise_variance_grid</span> <span class="o">=</span> <span class="n">no</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">no</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span> <span class="ow">and</span> <span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_rx</span><span class="p">),</span> <span class="p">(</span>
+                <span class="s2">"`no` has incompatible batch or receiver dimension."</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">noise_variance_grid</span> <span class="o">=</span> <span class="n">no</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rx_ant</span><span class="p">:</span>
+                <span class="c1"># Row-major antenna order: ant = row * num_cols + col.</span>
+                <span class="n">noise_variance_grid</span> <span class="o">=</span> <span class="n">no</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                    <span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">no</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"`no` has incompatible receive-antenna dimension."</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"`no` must have rank 0, 1, 2, or 3."</span>
+
+        <span class="k">return</span> <span class="n">noise_variance_grid</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+            <span class="n">batch_size</span><span class="p">,</span> <span class="n">num_rx</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_center_phases</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">dim_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Build phase ramps for one centered Fourier dimension."""</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dim_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">center_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">base_phase</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">indices</span> <span class="o">*</span> <span class="n">center_index</span> <span class="o">/</span> <span class="n">dim_size</span>
+        <span class="n">atom_phase</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">base_phase</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdtype</span><span class="p">))</span>
+        <span class="n">measurement_phase</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="mi">1</span><span class="n">j</span>
+                <span class="o">*</span> <span class="p">(</span><span class="n">base_phase</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">center_index</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">dim_size</span><span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdtype</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">measurement_phase</span><span class="p">,</span> <span class="n">atom_phase</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_center_phase_buffers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Return centered Fourier phase buffers in subcarrier, row, column order."""</span>
+        <span class="n">measurement_phases</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_phase_subcarrier</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_phase_row</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_phase_column</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">atom_phases</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_atom_phase_subcarrier</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_atom_phase_row</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_atom_phase_column</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">measurement_phases</span><span class="p">,</span> <span class="n">atom_phases</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_center_phase_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">phase</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Shape a 1D phase buffer for broadcasting along one tensor dimension."""</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span>
+        <span class="n">shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">phase</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">shape</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_centered_fourier</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">dims</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Apply the unitary centered positive-sign Fourier operator."""</span>
+        <span class="n">measurement_phases</span><span class="p">,</span> <span class="n">atom_phases</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_phase_buffers</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">atom_phases</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">*</span> <span class="n">phase</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_center_phase_shape</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s2">"ortho"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">measurement_phases</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">*</span> <span class="n">phase</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_center_phase_shape</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_centered_fourier_full_subcarriers</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Apply the centered Fourier part of ``S(F)`` to all groups."""</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_full_subcarrier_transform</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
+            <span class="s2">"...gprck,gfp-&gt;...gfrck"</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">transform</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centered_fourier_spatial</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_centered_fourier_spatial</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">dims</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Apply the centered Fourier operator on row and column dimensions."""</span>
+        <span class="n">measurement_phases</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_phase_row</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_phase_column</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">atom_phases</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_atom_phase_row</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_atom_phase_column</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">atom_phases</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">*</span> <span class="n">phase</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_center_phase_shape</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s2">"ortho"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">measurement_phases</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">*</span> <span class="n">phase</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_center_phase_shape</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_centered_fourier_adjoint</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">dims</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Apply the Hermitian adjoint of `_centered_fourier`."""</span>
+        <span class="n">measurement_phases</span><span class="p">,</span> <span class="n">atom_phases</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_phase_buffers</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">measurement_phases</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_center_phase_shape</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s2">"ortho"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">atom_phases</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_center_phase_shape</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

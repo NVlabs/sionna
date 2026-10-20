@@ -1,0 +1,1059 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sionna.bench.mimo_ofdm_chest.papers.balevi2020.estimator &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css?v=cffce40c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/leaderboard/styles.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../../../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sionna/bench/mimo_ofdm_chest/papers/balevi2020/estimator';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <script type="module" src="../../../../../../_static/leaderboard/app.js"></script>
+    <link rel="canonical" href="/sionna/_modules/sionna/bench/mimo_ofdm_chest/papers/balevi2020/estimator.html" />
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../../../../../../_static/searchtools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    <script src="../../../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../bench/index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../bench/index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sionna.bench.mimo_ofdm_chest.papers.balevi2020.estimator</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sionna.bench.mimo_ofdm_chest.papers.balevi2020.estimator</h1><div class="highlight"><pre>
+<span></span><span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="sd">"""Untrained deep-prior channel estimator from Balevi et al., 2020."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Precision</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.ofdm</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BasePilotChannelEstimator</span><span class="p">,</span>
+    <span class="n">BaseChannelInterpolator</span><span class="p">,</span>
+    <span class="n">LSChannelEstimator</span><span class="p">,</span>
+    <span class="n">ResourceGrid</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.ofdm.channel_estimation</span><span class="w"> </span><span class="kn">import</span> <span class="n">_PilotGroupMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.func</span><span class="w"> </span><span class="kn">import</span> <span class="n">functional_call</span><span class="p">,</span> <span class="n">stack_module_state</span><span class="p">,</span> <span class="n">vmap</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_DeepPriorDenoiser</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Bias-free deep decoder used for LS pilot-grid denoising."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">hidden_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">output_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">output_size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">num_hidden_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_channels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">output_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">output_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_hidden_layers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_hidden_layers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upsampling_schedule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_upsampling_schedule</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_hidden_layers</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_convolutions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_hidden_layers</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_norm_scales</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ParameterList</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_hidden_layers</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_norm_offsets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ParameterList</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_hidden_layers</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_convolution</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hidden_channels</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_channels</span><span class="p">,</span>
+            <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_upsampling_schedule</span><span class="p">(</span>
+        <span class="n">output_size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">num_hidden_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Return deterministic bilinear upsampling sizes."""</span>
+        <span class="n">num_upsampling_layers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_hidden_layers</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">num_upsampling_layers</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`num_hidden_layers` must be positive."</span><span class="p">)</span>
+        <span class="n">frequency_size</span><span class="p">,</span> <span class="n">time_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">output_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">frequency_size</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">num_upsampling_layers</span> <span class="o">-</span> <span class="n">index</span><span class="p">)),</span>
+                <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">time_size</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">num_upsampling_layers</span> <span class="o">-</span> <span class="n">index</span><span class="p">)),</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_upsampling_layers</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Return the shape expected for the fixed random input."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">upsampling_schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fixed_input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Map fixed random input to a denoised observation tensor."""</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">fixed_input</span>
+        <span class="k">for</span> <span class="n">layer_index</span><span class="p">,</span> <span class="p">(</span><span class="n">convolution</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hidden_convolutions</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">batch_norm_scales</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">batch_norm_offsets</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">convolution</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">layer_index</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_hidden_layers</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span>
+                    <span class="n">features</span><span class="p">,</span>
+                    <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">upsampling_schedule</span><span class="p">[</span><span class="n">layer_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="s2">"bilinear"</span><span class="p">,</span>
+                    <span class="n">align_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+            <span class="c1"># Keep normalization statistics local to each vmapped network.</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">variance</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">correction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="p">(</span><span class="n">features</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rsqrt</span><span class="p">(</span><span class="n">variance</span> <span class="o">+</span> <span class="mf">1e-5</span><span class="p">)</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">features</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+                <span class="o">+</span> <span class="n">offset</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_convolution</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DeepPriorChannelEstimator">
+<a class="viewcode-back" href="../../../../../../bench/benchmarks/mimo_ofdm_chest/estimators/neural_networks/sionna.bench.mimo_ofdm_chest.papers.balevi2020.DeepPriorChannelEstimator.html#sionna.bench.mimo_ofdm_chest.papers.balevi2020.DeepPriorChannelEstimator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeepPriorChannelEstimator</span><span class="p">(</span><span class="n">BasePilotChannelEstimator</span><span class="p">,</span> <span class="n">_PilotGroupMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Channel estimator that leverages an untrained neural network as prior,</span>
+<span class="sd">    by fitting it to online to the noisy channel observations.</span>
+
+<span class="sd">    This implementation follows the method proposed in:</span>
+
+<span class="sd">    .. container:: bibliography-box</span>
+
+<span class="sd">        .. bibliography::</span>
+<span class="sd">            :filter: key == "balevi2020massive"</span>
+<span class="sd">            :list: bullet</span>
+
+<span class="sd">    .. rubric:: TL;DR</span>
+
+<span class="sd">    The estimator first forms an LS estimate of the channel at the pilot</span>
+<span class="sd">    locations and then uses a neural network as a prior by fitting it to the</span>
+<span class="sd">    LS estimate for a fixed, random input. The corresponding fitted output is</span>
+<span class="sd">    used as the denoised estimate of the channel at the pilot locations.</span>
+
+<span class="sd">    .. rubric:: Supported System Geometry</span>
+
+<span class="sd">    The estimator derives its network dimensions from the resource grid and</span>
+<span class="sd">    supports different FFT sizes, OFDM-symbol counts, UE counts, and BS</span>
+<span class="sd">    receive-antenna counts, provided that the following hold:</span>
+
+<span class="sd">    - Active pilots for every transmit stream form a complete rectangular</span>
+<span class="sd">      grid over their distinct OFDM subcarriers and OFDM symbols.</span>
+<span class="sd">    - All streams have the same number of active pilot subcarriers.</span>
+<span class="sd">    - All streams have the same number of active pilot-bearing OFDM symbols.</span>
+
+<span class="sd">    .. rubric:: Deviations from the Paper</span>
+
+<span class="sd">    - Unlike in the paper, the neural network is not fitted to the complete received</span>
+<span class="sd">      resource grid because the random data symbols were found to destroy the required</span>
+<span class="sd">      structure for the denoising task. Instead, the estimator forms an LS estimate only</span>
+<span class="sd">      at the pilot locations and fits the untrained network to these LS estimates.</span>
+<span class="sd">      This inversion of the paper's denoising-before-LS order was found to be material.</span>
+<span class="sd">    - The paper assumes pilot observations on all subcarriers and does not define</span>
+<span class="sd">      interpolation for Sionna's sparse Kronecker pilot pattern. This implementation</span>
+<span class="sd">      has to be combined with a dedicated interpolator.</span>
+<span class="sd">    - The paper's repeated bilinear upsampling by a factor of two is adapted to arbitrary</span>
+<span class="sd">      pilot-grid dimensions using adapted intermediate sizes that result in the right target shape.</span>
+<span class="sd">    - Our implementation uses a fixed learning rate and number of optimization steps</span>
+<span class="sd">      whose default values were optimized using Optuna.</span>
+<span class="sd">    - The paper does not specify detector-facing error variances, so the implementation</span>
+<span class="sd">      returns ``err_var_scale * no``, where the default value of ``err_var_scale`` was</span>
+<span class="sd">      selected using Optuna.</span>
+
+<span class="sd">    :param resource_grid: Sionna resource grid defining the pilot pattern.</span>
+<span class="sd">    :param interpolation_type: Sionna interpolation policy. Supported values</span>
+<span class="sd">        are ``"nn"``, ``"lin"``, and ``"lin_time_avg"``. This argument is</span>
+<span class="sd">        ignored when ``interpolator`` is provided.</span>
+<span class="sd">    :param interpolator: Custom Sionna channel interpolator. If `None`, the</span>
+<span class="sd">        interpolator selected by ``interpolation_type`` is used.</span>
+<span class="sd">    :param hidden_channels: Hidden spatial-channel width ``k``.</span>
+<span class="sd">    :param num_hidden_layers: Number of hidden layers in the deep-prior</span>
+<span class="sd">        network.</span>
+<span class="sd">    :param num_steps: Number of Adam steps used for per-grid runtime fitting.</span>
+<span class="sd">        A value of zero bypasses denoising and is intended for diagnostics.</span>
+<span class="sd">    :param learning_rate: Adam learning rate.</span>
+<span class="sd">    :param input_noise_scale: Upper endpoint of the fixed network input sampled</span>
+<span class="sd">        uniformly from ``[0, input_noise_scale)``.</span>
+<span class="sd">    :param seed: Seed used for the fixed input and per-example weight</span>
+<span class="sd">        initialization.</span>
+<span class="sd">    :param err_var_scale: Scale applied to the detector-facing LS error</span>
+<span class="sd">        variance fallback.</span>
+<span class="sd">    :param precision: Precision used for internal calculations and outputs.</span>
+<span class="sd">        If `None`, :attr:`~sionna.phy.config.Config.precision` is used.</span>
+<span class="sd">    :param device: Device for tensor operations. If `None`,</span>
+<span class="sd">        :attr:`~sionna.phy.config.Config.device` is used.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource_grid</span><span class="p">:</span> <span class="n">ResourceGrid</span><span class="p">,</span>
+        <span class="n">interpolation_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"lin_time_avg"</span><span class="p">,</span>
+        <span class="n">interpolator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BaseChannelInterpolator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">hidden_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="n">num_hidden_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="n">num_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1597</span><span class="p">,</span>
+        <span class="n">learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.000698</span><span class="p">,</span>
+        <span class="n">input_noise_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.70</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
+        <span class="n">err_var_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.454</span><span class="p">,</span>
+        <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Initialize the fixed geometry and fitting hyperparameters."""</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">hidden_channels</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"`hidden_channels` must be a positive integer."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_hidden_layers</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">num_hidden_layers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"`num_hidden_layers` must be a positive integer."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_steps</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">num_steps</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"`num_steps` must be a non-negative integer."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span>
+            <span class="n">learning_rate</span>
+        <span class="p">),</span> <span class="s2">"`learning_rate` must be finite."</span>
+        <span class="k">assert</span> <span class="n">learning_rate</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"`learning_rate` must be positive."</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_noise_scale</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span>
+            <span class="n">input_noise_scale</span>
+        <span class="p">),</span> <span class="s2">"`input_noise_scale` must be finite."</span>
+        <span class="k">assert</span> <span class="n">input_noise_scale</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"`input_noise_scale` must be positive."</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">"`seed` must be an integer."</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">err_var_scale</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span>
+            <span class="n">err_var_scale</span>
+        <span class="p">),</span> <span class="s2">"`err_var_scale` must be finite."</span>
+        <span class="k">assert</span> <span class="n">err_var_scale</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"`err_var_scale` must be non-negative."</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">resource_grid</span><span class="o">=</span><span class="n">resource_grid</span><span class="p">,</span>
+            <span class="n">interpolation_type</span><span class="o">=</span><span class="n">interpolation_type</span><span class="p">,</span>
+            <span class="n">interpolator</span><span class="o">=</span><span class="n">interpolator</span><span class="p">,</span>
+            <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hidden_channels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_hidden_layers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_hidden_layers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_steps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_steps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_learning_rate</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_noise_scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">input_noise_scale</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_err_var_scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">err_var_scale</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_effective_subcarriers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">resource_grid</span><span class="o">.</span><span class="n">num_effective_subcarriers</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_pilot_groups</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="p">,</span>
+            <span class="n">group_over</span><span class="o">=</span><span class="p">(</span><span class="s2">"subcarrier"</span><span class="p">,</span> <span class="s2">"symbol"</span><span class="p">),</span>
+            <span class="n">active_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_pilot_image_metadata</span><span class="p">()</span>
+        <span class="n">denoiser_shape</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilot_subcarriers</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilot_ofdm_symbols</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">input_size</span> <span class="o">=</span> <span class="n">_DeepPriorDenoiser</span><span class="o">.</span><span class="n">_build_upsampling_schedule</span><span class="p">(</span>
+            <span class="n">denoiser_shape</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_hidden_layers</span><span class="p">,</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span>
+            <span class="s2">"_fixed_input"</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_make_fixed_input</span><span class="p">(</span><span class="n">input_size</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="DeepPriorChannelEstimator.estimate_at_pilot_locations">
+<a class="viewcode-back" href="../../../../../../bench/benchmarks/mimo_ofdm_chest/estimators/neural_networks/sionna.bench.mimo_ofdm_chest.papers.balevi2020.DeepPriorChannelEstimator.html#sionna.bench.mimo_ofdm_chest.papers.balevi2020.DeepPriorChannelEstimator.estimate_at_pilot_locations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_at_pilot_locations</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">y_pilots</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">no</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Estimate denoised channels at Sionna pilot locations.</span>
+
+<span class="sd">        :param y_pilots: [batch_size, num_rx, num_rx_ant, num_tx, num_streams, num_pilot_symbols], `torch.complex`.</span>
+<span class="sd">            Observed signals for the pilot-carrying resource elements.</span>
+<span class="sd">        :param no: [batch_size, num_rx, num_rx_ant] or only the first n&gt;=0 dims, `torch.float`.</span>
+<span class="sd">            Variance of the AWGN.</span>
+
+<span class="sd">        :output h_hat: [batch_size, num_rx, num_rx_ant, num_tx, num_streams, num_pilot_symbols], `torch.complex`.</span>
+<span class="sd">            Channel estimates for the pilot-carrying resource elements.</span>
+<span class="sd">        :output err_var: Same shape as ``h_hat``, `torch.float`.</span>
+<span class="sd">            Channel estimation error variance for the pilot-carrying</span>
+<span class="sd">            resource elements.</span>
+<span class="sd">        """</span>
+        <span class="n">h_ls</span><span class="p">,</span> <span class="n">err_var</span> <span class="o">=</span> <span class="n">LSChannelEstimator</span><span class="o">.</span><span class="n">estimate_at_pilot_locations</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">y_pilots</span><span class="p">,</span>
+            <span class="n">no</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_steps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">h_ls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_err_var_scale</span> <span class="o">*</span> <span class="n">err_var</span>
+
+        <span class="n">grouped_h_ls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gather_pilot_groups</span><span class="p">(</span><span class="n">h_ls</span><span class="p">)</span>
+        <span class="n">denoised_grouped_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_ls_pilot_denoiser</span><span class="p">(</span><span class="n">grouped_h_ls</span><span class="p">)</span>
+        <span class="n">h_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scatter_pilot_groups</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">h_ls</span><span class="p">),</span> <span class="n">denoised_grouped_h</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">h_hat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_err_var_scale</span> <span class="o">*</span> <span class="n">err_var</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_pilot_image_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Validate active pilot groups form rectangular frequency-time images."""</span>
+        <span class="n">group_subcarrier_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_varying_coord</span><span class="p">(</span><span class="s2">"subcarrier"</span><span class="p">)</span>
+        <span class="n">group_symbol_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_varying_coord</span><span class="p">(</span><span class="s2">"symbol"</span><span class="p">)</span>
+        <span class="n">num_pilot_subcarriers</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">num_pilot_ofdm_symbols</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">group_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_num_groups</span><span class="p">):</span>
+            <span class="n">subcarriers</span> <span class="o">=</span> <span class="n">group_subcarrier_indices</span><span class="p">[</span><span class="n">group_index</span><span class="p">]</span>
+            <span class="n">symbols</span> <span class="o">=</span> <span class="n">group_symbol_indices</span><span class="p">[</span><span class="n">group_index</span><span class="p">]</span>
+            <span class="n">unique_subcarriers</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique_consecutive</span><span class="p">(</span><span class="n">subcarriers</span><span class="p">)</span>
+            <span class="n">unique_symbols</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="nb">sorted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">num_pilot_subcarriers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">num_pilot_subcarriers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">unique_subcarriers</span><span class="o">.</span><span class="n">numel</span><span class="p">())</span>
+                <span class="n">num_pilot_ofdm_symbols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">unique_symbols</span><span class="o">.</span><span class="n">numel</span><span class="p">())</span>
+            <span class="k">assert</span> <span class="nb">int</span><span class="p">(</span><span class="n">unique_subcarriers</span><span class="o">.</span><span class="n">numel</span><span class="p">())</span> <span class="o">==</span> <span class="n">num_pilot_subcarriers</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">"Balevi pilot denoising requires equal active pilot-frequency "</span>
+                <span class="s2">"counts for all streams."</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">int</span><span class="p">(</span><span class="n">unique_symbols</span><span class="o">.</span><span class="n">numel</span><span class="p">())</span> <span class="o">==</span> <span class="n">num_pilot_ofdm_symbols</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">"Balevi pilot denoising requires equal active pilot-symbol "</span>
+                <span class="s2">"counts for all streams."</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">int</span><span class="p">(</span><span class="n">subcarriers</span><span class="o">.</span><span class="n">numel</span><span class="p">())</span> <span class="o">==</span> <span class="p">(</span>
+                <span class="n">num_pilot_subcarriers</span> <span class="o">*</span> <span class="n">num_pilot_ofdm_symbols</span>
+            <span class="p">),</span> <span class="p">(</span>
+                <span class="s2">"Balevi pilot denoising requires each active pilot group to "</span>
+                <span class="s2">"form a rectangular subcarrier-by-symbol grid."</span>
+            <span class="p">)</span>
+            <span class="n">expected_subcarriers</span> <span class="o">=</span> <span class="n">unique_subcarriers</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span>
+                <span class="n">num_pilot_ofdm_symbols</span>
+            <span class="p">)</span>
+            <span class="n">expected_symbols</span> <span class="o">=</span> <span class="n">unique_symbols</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">num_pilot_subcarriers</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">bool</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">subcarriers</span> <span class="o">==</span> <span class="n">expected_subcarriers</span><span class="p">)),</span> <span class="p">(</span>
+                <span class="s2">"Balevi pilot denoising expects pilot groups ordered as "</span>
+                <span class="s2">"frequency-major rectangular images."</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">bool</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">symbols</span> <span class="o">==</span> <span class="n">expected_symbols</span><span class="p">)),</span> <span class="p">(</span>
+                <span class="s2">"Balevi pilot denoising expects pilot groups ordered as "</span>
+                <span class="s2">"frequency-major rectangular images."</span>
+            <span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">num_pilot_subcarriers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">num_pilot_ofdm_symbols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilot_subcarriers</span> <span class="o">=</span> <span class="n">num_pilot_subcarriers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilot_ofdm_symbols</span> <span class="o">=</span> <span class="n">num_pilot_ofdm_symbols</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_fixed_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Create the fixed random input ``Z0`` without perturbing global RNG."""</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fork_rng</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span><span class="p">):</span>
+            <span class="n">fixed_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span>
+                <span class="mi">1</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_hidden_channels</span><span class="p">,</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">input_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">input_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_noise_scale</span> <span class="o">*</span> <span class="n">fixed_input</span>
+
+    <span class="nd">@contextmanager</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fork_rng</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Temporarily seed torch RNGs while restoring caller RNG state."""</span>
+        <span class="n">devices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">"cuda"</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="n">devices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_device</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">fork_rng</span><span class="p">(</span><span class="n">devices</span><span class="o">=</span><span class="n">devices</span><span class="p">):</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">seed</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">devices</span><span class="p">:</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed_all</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">seed</span><span class="p">))</span>
+            <span class="k">yield</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fit_ls_pilot_denoiser</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">grouped_h_ls</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Fit untrained denoisers to active LS channel-observation grids."""</span>
+        <span class="n">batch_size</span><span class="p">,</span> <span class="n">num_rx</span><span class="p">,</span> <span class="n">num_rx_ant</span> <span class="o">=</span> <span class="n">grouped_h_ls</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">num_groups</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">grouped_h_ls</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">pilot_images</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">grouped_h_ls</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span>
+                <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilot_subcarriers</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilot_ofdm_symbols</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">pilot_images</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">pilot_images</span><span class="o">.</span><span class="n">imag</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">denoised_target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_real_channel_images</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">denoised_images</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span>
+            <span class="n">denoised_target</span><span class="p">[:,</span> <span class="p">:</span><span class="n">num_rx_ant</span><span class="p">],</span>
+            <span class="n">denoised_target</span><span class="p">[:,</span> <span class="n">num_rx_ant</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">num_rx_ant</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">denoised_images</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_rx</span><span class="p">,</span> <span class="n">num_groups</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">disable</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fit_real_channel_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Fit independent denoisers inside the explicit eager boundary."""</span>
+        <span class="n">num_examples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">output_size</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">output_channels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">denoisers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">example_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_examples</span><span class="p">):</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fork_rng</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span> <span class="o">+</span> <span class="n">example_index</span><span class="p">):</span>
+                <span class="n">denoiser</span> <span class="o">=</span> <span class="n">_DeepPriorDenoiser</span><span class="p">(</span>
+                    <span class="n">hidden_channels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hidden_channels</span><span class="p">,</span>
+                    <span class="n">output_channels</span><span class="o">=</span><span class="n">output_channels</span><span class="p">,</span>
+                    <span class="n">output_size</span><span class="o">=</span><span class="n">output_size</span><span class="p">,</span>
+                    <span class="n">num_hidden_layers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_hidden_layers</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">target</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">target</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">denoiser</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+            <span class="n">denoisers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">denoiser</span><span class="p">)</span>
+
+        <span class="n">parameters</span><span class="p">,</span> <span class="n">buffers</span> <span class="o">=</span> <span class="n">stack_module_state</span><span class="p">(</span><span class="n">denoisers</span><span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">denoisers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+            <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_learning_rate</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">fixed_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_input</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">target</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">target</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">num_examples</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">forward_one</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">network_input</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">functional_call</span><span class="p">(</span>
+                <span class="n">template</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">buffer</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">network_input</span><span class="p">,),</span>
+            <span class="p">)</span>
+
+        <span class="n">forward_all</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">forward_one</span><span class="p">,</span> <span class="n">in_dims</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_steps</span><span class="p">):</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">(</span><span class="n">set_to_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">fitted</span> <span class="o">=</span> <span class="n">forward_all</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">buffers</span><span class="p">,</span> <span class="n">fixed_input</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">fitted</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">square</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">forward_all</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">buffers</span><span class="p">,</span> <span class="n">fixed_input</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+            <span class="p">)</span></div>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"DeepPriorChannelEstimator"</span><span class="p">]</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

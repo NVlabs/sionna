@@ -1,0 +1,934 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SparseDiffuseChannelEstimator &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=cffce40c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/leaderboard/styles.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"chtml": {"matchFontHeight": false}, "tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'bench/benchmarks/mimo_ofdm_chest/estimators/sparse/sionna.bench.mimo_ofdm_chest.papers.lyu2026.SparseDiffuseChannelEstimator';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <script type="module" src="../../../../../_static/leaderboard/app.js"></script>
+    <link rel="canonical" href="/sionna/bench/benchmarks/mimo_ofdm_chest/estimators/sparse/sionna.bench.mimo_ofdm_chest.papers.lyu2026.SparseDiffuseChannelEstimator.html" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="SBLChannelEstimator" href="sionna.bench.mimo_ofdm_chest.papers.wei2017.SBLChannelEstimator.html" />
+    <link rel="prev" title="RKHSChannelEstimator" href="sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../../../../../_static/searchtools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    <script src="../../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../../index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../../index.html">Benchmarks</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../index.html">MIMO-OFDM Channel Estimation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../leaderboard.html">Leaderboard</a></li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="../index.html">Channel Estimators</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4 has-children"><a class="reference internal" href="../linear/index.html">Linear Channel Estimators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../linear/sionna.phy.ofdm.LSChannelEstimator.html">LSChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../linear/sionna.phy.ofdm.LMMSEChannelEstimator.html">LMMSEChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../linear/sionna.bench.mimo_ofdm_chest.papers.edfors1996.TruncatedChannelEstimator.html">TruncatedChannelEstimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../interpolators/index.html">Channel Interpolators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../interpolators/sionna.phy.ofdm.NearestNeighborInterpolator.html">NearestNeighborInterpolator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../interpolators/sionna.phy.ofdm.LinearInterpolator.html">LinearInterpolator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../interpolators/sionna.bench.mimo_ofdm_chest.papers.coleri2002.CombInterpolator.html">CombInterpolator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 current active has-children"><a class="reference internal" href="index.html">Sparsity-Based Channel Estimators</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator.html">RKHSChannelEstimator</a></li>
+<li class="toctree-l5 current active"><a class="current reference internal" href="#">SparseDiffuseChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="sionna.bench.mimo_ofdm_chest.papers.wei2017.SBLChannelEstimator.html">SBLChannelEstimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../latent_variable/index.html">Latent Variable-Based Channel Estimators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../latent_variable/sionna.bench.mimo_ofdm_chest.papers.baur2022.VAEChannelEstimator.html">VAEChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../latent_variable/sionna.bench.mimo_ofdm_chest.papers.koller2022.SpatialGMMChannelEstimator.html">SpatialGMMChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../latent_variable/sionna.bench.mimo_ofdm_chest.papers.koller2022.SpectralGMMChannelEstimator.html">SpectralGMMChannelEstimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../neural_networks/index.html">Neural Network-Based Channel Estimators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../neural_networks/sionna.bench.mimo_ofdm_chest.papers.li2020.ReEsNetChannelEstimator.html">ReEsNetChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../neural_networks/sionna.bench.mimo_ofdm_chest.papers.balevi2020.DeepPriorChannelEstimator.html">DeepPriorChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../neural_networks/sionna.bench.mimo_ofdm_chest.papers.melgar2022.DNNChannelEstimator.html">DNNChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../neural_networks/sionna.bench.mimo_ofdm_chest.papers.melgar2022.InterpolatedDNNChannelEstimator.html">InterpolatedDNNChannelEstimator</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../get_started.html">Get Started</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../../index.html" class="nav-link">Bench</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Benchmarks</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">MIMO-OFDM Channel Estimation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Channel Estimators</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Sparsity-Based Channel Estimators</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">SparseDiffuseChannelEstimator</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="sparsediffusechannelestimator">
+<h1>SparseDiffuseChannelEstimator<a class="headerlink" href="#sparsediffusechannelestimator" title="Link to this heading">#</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Estimator constructor defaults mirror the settings used during benchmarking.</p></li>
+</ul>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.bench.mimo_ofdm_chest.papers.lyu2026.SparseDiffuseChannelEstimator">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">sionna.bench.mimo_ofdm_chest.papers.lyu2026.</span></span><span class="sig-name descname"><span class="pre">SparseDiffuseChannelEstimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../../../phy/api/ofdm/sionna.phy.ofdm.ResourceGrid.html#sionna.phy.ofdm.ResourceGrid" title="sionna.phy.ofdm.resource_grid.ResourceGrid"><span class="pre">sionna.phy.ofdm.resource_grid.ResourceGrid</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffuse_num_taps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_noise_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6.55</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffuse_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.807</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err_var_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admm_rho</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admm_num_iters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">18</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lin_time_avg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../../../phy/api/ofdm/sionna.phy.ofdm.BaseChannelInterpolator.html#sionna.phy.ofdm.BaseChannelInterpolator" title="sionna.phy.ofdm.channel_estimation.BaseChannelInterpolator"><span class="pre">sionna.phy.ofdm.channel_estimation.BaseChannelInterpolator</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'single'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'double'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/sionna/bench/mimo_ofdm_chest/papers/lyu2026/estimator.html#SparseDiffuseChannelEstimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.bench.mimo_ofdm_chest.papers.lyu2026.SparseDiffuseChannelEstimator" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../../../../phy/api/ofdm/sionna.phy.ofdm.BasePilotChannelEstimator.html#sionna.phy.ofdm.BasePilotChannelEstimator" title="sionna.phy.ofdm.channel_estimation.BasePilotChannelEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.phy.ofdm.channel_estimation.BasePilotChannelEstimator</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.phy.ofdm.channel_estimation._PilotGroupMixin</span></code></p>
+<p>Channel estimator that leverages sparsity through hyyrid diffuse/sparse atomic-norm minimization.</p>
+<p>This estimator implements the method proposed in:</p>
+<div class="bibliography-box docutils container">
+<ul class="simple" id="id1">
+<li id="id98"><p>Lei Lyu, Maxime Ferreira Da Costa, and Urbashi Mitra. Atomic hybrid sparse/diffuse channel estimation and Cramér-Rao bounds analysis. <em>arXiv preprint arXiv:2605.01825</em>, 2026.</p></li>
+</ul>
+</div>
+<p class="rubric">TL;DR</p>
+<p>The paper models the channel frequency response as the sum of a sparse
+specular component and a diffuse component,
+<span class="math notranslate nohighlight">\(\mathbf{h} = \mathbf{h}_{\mathrm{s}} + \mathbf{D}\boldsymbol{\gamma}\)</span>.
+The continuous-delay representation of <span class="math notranslate nohighlight">\(\mathbf{h}_{\mathrm{s}}\)</span> is
+promoted to be sparse through atomic-norm regularization. The diffuse component
+<span class="math notranslate nohighlight">\(\mathbf{D}\boldsymbol{\gamma}\)</span> lies in the column space of the known
+Fourier dictionary <span class="math notranslate nohighlight">\(\mathbf{D}\)</span>, whose columns represent uniformly spaced
+delay taps, and its coefficients satisfy the energy constraint
+<span class="math notranslate nohighlight">\(\lVert\boldsymbol{\gamma}\rVert_2^2 \leq E_{\mathrm{d}}\)</span>.</p>
+<p>This implementation first divides the received pilots by their known values.
+Repeated pilot-symbol observations belonging to the same transmit stream are
+then averaged independently for every receive antenna. Each averaged pilot
+comb is treated as a reduced OFDM grid, and the corresponding reduced-grid
+form of Program P2 is solved approximately using batched Torch ADMM. The
+estimator returns the resulting regularized reconstruction
+<span class="math notranslate nohighlight">\(\mathbf{h}_{\mathrm{s}}+\mathbf{D}\boldsymbol{\gamma}\)</span> and uses the
+configured Sionna interpolator to reconstruct the remaining resource elements.</p>
+<p class="rubric">Supported System Geometry</p>
+<p>The estimator supports different FFT sizes, UE counts, pilot-bearing OFDM
+symbols, uniform pilot-comb spacings, transmit-stream counts, and receive
+antenna counts, provided that the following hold:</p>
+<ul class="simple">
+<li><p>Every active pilot group is a uniformly spaced subcarrier comb.</p></li>
+<li><p>All pilot groups have the same number of active subcarriers.</p></li>
+<li><p>All active pilot values are non-zero.</p></li>
+<li><p>Repeated pilot groups belonging to the same transmit stream represent the
+same ordered subcarrier comb because they are averaged elementwise.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">diffuse_num_taps</span></code> is between one and the common pilot-comb length.</p></li>
+</ul>
+<p>Repeated pilot observations are combined independently for each transmit
+stream and receive antenna. No common sparse support is imposed across receive
+antennas.</p>
+<p class="rubric">Deviations from the Paper</p>
+<ul class="simple">
+<li><p>The paper assumes complete observations over all OFDM subcarriers. This
+implementation instead applies the paper’s Program P2 to each sparse
+pilot comb, interpreted as a reduced OFDM grid with a correspondingly
+larger effective subcarrier spacing.</p></li>
+<li><p>The paper does not define interpolation. Off-pilot reconstruction is
+therefore delegated to a configurable Sionna interpolator.</p></li>
+<li><p>Program P2 is solved approximately using a fixed number of batched ADMM
+iterations rather than an exact generic semidefinite-program solver.</p></li>
+<li><p>Continuous support extraction from Equation (16) and projection debiasing
+from Equation (17) are not implemented. The regularized, and therefore
+generally biased, P2 reconstruction is returned directly.</p></li>
+<li><p>Receive antennas are estimated independently; the implementation does not
+introduce a multiple-measurement-vector or shared-support model.</p></li>
+<li><p>The paper does not specify detector-facing marginal error variances. For
+averaging weights <span class="math notranslate nohighlight">\(w_g\)</span>, this implementation uses</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[c_{\mathrm{err}}\,\sigma^2
+\sum_g \frac{w_g^2}{|p_g|^2},\]</div>
+<p>followed by the configured Sionna interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_grid</strong> (<a class="reference internal" href="../../../../../phy/api/ofdm/sionna.phy.ofdm.ResourceGrid.html#sionna.phy.ofdm.ResourceGrid" title="sionna.phy.ofdm.ResourceGrid"><em>ResourceGrid</em></a>) – Resource grid defining the OFDM dimensions and pilot
+pattern.</p></li>
+<li><p><strong>diffuse_num_taps</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em>]</em>) – Number of columns in the reduced-grid diffuse
+dictionary. If <cite>None</cite>, use the complete pilot-comb length.</p></li>
+<li><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – Constant weight of the atomic-norm Toeplitz term. Used when
+<code class="docutils literal notranslate"><span class="pre">tau_noise_scale</span></code> is <cite>None</cite>.</p></li>
+<li><p><strong>tau_noise_scale</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>]</em>) – Optional multiplier used to derive the regularization
+weight from the mean input noise variance. If provided, the effective
+weight is <code class="docutils literal notranslate"><span class="pre">clamp(tau_noise_scale*mean(no),</span> <span class="pre">tau_min,</span> <span class="pre">tau_max)</span></code>.</p></li>
+<li><p><strong>tau_min</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – Lower bound applied to the noise-dependent regularization
+weight.</p></li>
+<li><p><strong>tau_max</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – Upper bound applied to the noise-dependent regularization
+weight.</p></li>
+<li><p><strong>diffuse_energy</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – Diffuse-coefficient energy bound
+<span class="math notranslate nohighlight">\(E_{\mathrm{d}}\)</span>.</p></li>
+<li><p><strong>err_var_scale</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – Non-negative scale applied to the detector-facing error
+variance.</p></li>
+<li><p><strong>admm_rho</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – Positive augmented-Lagrangian penalty used by ADMM.</p></li>
+<li><p><strong>admm_num_iters</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – Number of ADMM iterations performed for every
+observation.</p></li>
+<li><p><strong>interpolation_type</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>) – Sionna interpolation policy used after estimating
+the pilot comb. Ignored when <code class="docutils literal notranslate"><span class="pre">interpolator</span></code> is provided.</p></li>
+<li><p><strong>interpolator</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="../../../../../phy/api/ofdm/sionna.phy.ofdm.BaseChannelInterpolator.html#sionna.phy.ofdm.BaseChannelInterpolator" title="sionna.phy.ofdm.BaseChannelInterpolator"><em>BaseChannelInterpolator</em></a><em>]</em>) – Custom Sionna channel interpolator. If <cite>None</cite>, the
+interpolator selected by <code class="docutils literal notranslate"><span class="pre">interpolation_type</span></code> is used.</p></li>
+<li><p><strong>precision</strong> (<em>Optional</em><em>[</em><em>Precision</em><em>]</em>) – Precision used for internal calculations and outputs. If
+<cite>None</cite>, <a class="reference internal" href="../../../../../phy/api/config.html#sionna.phy.config.Config.precision" title="sionna.phy.config.Config.precision"><code class="xref py py-attr docutils literal notranslate"><span class="pre">precision</span></code></a> is used.</p></li>
+<li><p><strong>device</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em>]</em>) – Device used for tensor operations. If <cite>None</cite>,
+<a class="reference internal" href="../../../../../phy/api/config.html#sionna.phy.config.Config.device" title="sionna.phy.config.Config.device"><code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code></a> is used.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.bench.mimo_ofdm_chest.papers.lyu2026.SparseDiffuseChannelEstimator.estimate_at_pilot_locations">
+<span class="sig-name descname"><span class="pre">estimate_at_pilot_locations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_pilots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../../_modules/sionna/bench/mimo_ofdm_chest/papers/lyu2026/estimator.html#SparseDiffuseChannelEstimator.estimate_at_pilot_locations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.bench.mimo_ofdm_chest.papers.lyu2026.SparseDiffuseChannelEstimator.estimate_at_pilot_locations" title="Link to this definition">#</a></dt>
+<dd><p>Estimate denoised channels at Sionna pilot locations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_pilots</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><em>torch.Tensor</em></a>) – [batch_size, num_rx, num_rx_ant, num_tx, num_streams, num_pilot_symbols], <cite>torch.complex</cite>.
+Observed signals for the pilot-carrying resource elements.</p></li>
+<li><p><strong>no</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><em>torch.Tensor</em></a>) – [batch_size, num_rx, num_rx_ant] or only the first n&gt;=0 dims, <cite>torch.float</cite>.
+Variance of the AWGN.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>h_hat</strong> – [batch_size, num_rx, num_rx_ant, num_tx, num_streams, num_pilot_symbols], <cite>torch.complex</cite>.
+Channel estimates for the pilot-carrying resource elements.</p></li>
+<li><p><strong>err_var</strong> – Same shape as <code class="docutils literal notranslate"><span class="pre">h_hat</span></code>, <cite>torch.float</cite>.
+Channel estimation error variance for the pilot-carrying
+resource elements.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="module-sionna.bench.mimo_ofdm_chest.papers.lyu2026.tuning">
+<span id="hyperparameter-tuning"></span><h2>Hyperparameter Tuning<a class="headerlink" href="#module-sionna.bench.mimo_ofdm_chest.papers.lyu2026.tuning" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.bench.mimo_ofdm_chest.papers.lyu2026.tuning.run_tuning">
+<span class="sig-prename descclassname"><span class="pre">sionna.bench.mimo_ofdm_chest.papers.lyu2026.tuning.</span></span><span class="sig-name descname"><span class="pre">run_tuning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">study</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'admm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_mc_batches</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm_output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/sionna/bench/mimo_ofdm_chest/papers/lyu2026/tuning.html#run_tuning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.bench.mimo_ofdm_chest.papers.lyu2026.tuning.run_tuning" title="Link to this definition">#</a></dt>
+<dd><p class="rubric">Algorithmic Tuning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;admm&quot;</span></code> stage minimizes weighted NMSE at -10, -5, 0, 5,
+and 10 dB. It runs 80 seeded TPE trials. Every trial evaluates three
+batches of four channels at each SNR and executes the complete batched
+Torch ADMM estimator.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Search space</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">diffuse_num_taps</span></code></p></td>
+<td><p>integer from 1 through 24</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tau_noise_scale</span></code></p></td>
+<td><p>logarithmic from 1e-2 through 1e2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">diffuse_energy</span></code></p></td>
+<td><p>logarithmic from 1e-3 through 1e2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">admm_rho</span></code></p></td>
+<td><p>logarithmic from 1e-2 through 3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">admm_num_iters</span></code></p></td>
+<td><p>integer from 5 through 20</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The study requires 80 completed trials. Failed or incomplete trials do not
+satisfy this requirement.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;admm-validation&quot;</span></code> stage compares the rounded winner with the
+existing estimator defaults using 63 batches of four channels per SNR.</p>
+<p class="rubric">Error-Variance Calibration</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;variance&quot;</span></code> stage tunes <code class="docutils literal notranslate"><span class="pre">err_var_scale</span></code> logarithmically from
+1e-3 through 1 using 10 TPE trials. Codeword BLER is evaluated at 10 dB
+over 63 batches of four channels using the algorithm parameters selected
+by paired validation.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;variance-validation&quot;</span></code> stage compares the rounded winner with the
+existing scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>study</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>) – Stage to execute: <code class="docutils literal notranslate"><span class="pre">&quot;admm&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;admm-validation&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;variance&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;variance-validation&quot;</span></code>.</p></li>
+<li><p><strong>n_trials</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em> | </em><em>None</em>) – Trial-count override. If <cite>None</cite>, use 80 for ADMM tuning
+and 10 for variance calibration. Validation stages do not run Optuna
+trials.</p></li>
+<li><p><strong>num_mc_batches</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em> | </em><em>None</em>) – Monte Carlo budget override. If <cite>None</cite>, use three
+batches per SNR for ADMM tuning and 63 for validation and variance
+calibration.</p></li>
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em> | </em><em>None</em>) – Channels per batch. If <cite>None</cite>, use the canonical
+configuration value of four.</p></li>
+<li><p><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><em>pathlib.Path</em></a><em> | </em><em>None</em>) – Output directory override for the selected stage.</p></li>
+<li><p><strong>algorithm_output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><em>pathlib.Path</em></a><em> | </em><em>None</em>) – Directory containing the ADMM tuning and
+paired-validation evidence required by variance calibration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An Optuna study for tuning stages or a dictionary containing
+paired-validation results for validation stages.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">RKHSChannelEstimator</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="sionna.bench.mimo_ofdm_chest.papers.wei2017.SBLChannelEstimator.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">SBLChannelEstimator</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.bench.mimo_ofdm_chest.papers.lyu2026.SparseDiffuseChannelEstimator"><code class="docutils literal notranslate"><span class="pre">SparseDiffuseChannelEstimator</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.bench.mimo_ofdm_chest.papers.lyu2026.SparseDiffuseChannelEstimator.estimate_at_pilot_locations"><code class="docutils literal notranslate"><span class="pre">SparseDiffuseChannelEstimator.estimate_at_pilot_locations()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sionna.bench.mimo_ofdm_chest.papers.lyu2026.tuning">Hyperparameter Tuning</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.bench.mimo_ofdm_chest.papers.lyu2026.tuning.run_tuning"><code class="docutils literal notranslate"><span class="pre">run_tuning()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../../../_sources/bench/benchmarks/mimo_ofdm_chest/estimators/sparse/sionna.bench.mimo_ofdm_chest.papers.lyu2026.SparseDiffuseChannelEstimator.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

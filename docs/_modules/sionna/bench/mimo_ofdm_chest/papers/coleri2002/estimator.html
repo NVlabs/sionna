@@ -1,0 +1,1407 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sionna.bench.mimo_ofdm_chest.papers.coleri2002.estimator &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css?v=cffce40c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/leaderboard/styles.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../../../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sionna/bench/mimo_ofdm_chest/papers/coleri2002/estimator';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <script type="module" src="../../../../../../_static/leaderboard/app.js"></script>
+    <link rel="canonical" href="/sionna/_modules/sionna/bench/mimo_ofdm_chest/papers/coleri2002/estimator.html" />
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../../../../../../_static/searchtools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    <script src="../../../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../bench/index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../bench/index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sionna.bench.mimo_ofdm_chest.papers.coleri2002.estimator</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sionna.bench.mimo_ofdm_chest.papers.coleri2002.estimator</h1><div class="highlight"><pre>
+<span></span><span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="sd">"""Comb-pilot LS estimators from Coleri et al. 2002."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">CubicSpline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">firls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Precision</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.ofdm</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BaseChannelInterpolator</span><span class="p">,</span>
+    <span class="n">LSChannelEstimator</span><span class="p">,</span>
+    <span class="n">PilotPattern</span><span class="p">,</span>
+    <span class="n">ResourceGrid</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.ofdm.channel_estimation</span><span class="w"> </span><span class="kn">import</span> <span class="n">_PilotGroupMixin</span>
+
+
+<span class="n">METHOD_TIME_DOMAIN</span> <span class="o">=</span> <span class="s2">"time-domain"</span>
+<span class="n">METHOD_SECOND_ORDER</span> <span class="o">=</span> <span class="s2">"second-order"</span>
+<span class="n">METHOD_LOWPASS</span> <span class="o">=</span> <span class="s2">"low-pass"</span>
+<span class="n">METHOD_SPLINE</span> <span class="o">=</span> <span class="s2">"cubic-spline"</span>
+<span class="n">METHOD_NAMES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">METHOD_SECOND_ORDER</span><span class="p">,</span>
+    <span class="n">METHOD_LOWPASS</span><span class="p">,</span>
+    <span class="n">METHOD_SPLINE</span><span class="p">,</span>
+    <span class="n">METHOD_TIME_DOMAIN</span><span class="p">,</span>
+<span class="p">]</span>
+
+<div class="viewcode-block" id="CombInterpolator">
+<a class="viewcode-back" href="../../../../../../bench/benchmarks/mimo_ofdm_chest/estimators/interpolators/sionna.bench.mimo_ofdm_chest.papers.coleri2002.CombInterpolator.html#sionna.bench.mimo_ofdm_chest.papers.coleri2002.CombInterpolator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CombInterpolator</span><span class="p">(</span><span class="n">BaseChannelInterpolator</span><span class="p">,</span> <span class="n">_PilotGroupMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Channel interpolator that leverages certain smoothness-assumptions to interpolate channel estimates.</span>
+
+<span class="sd">    This interpolator implements the methods proposed in:</span>
+
+<span class="sd">    .. container:: bibliography-box</span>
+
+<span class="sd">        .. bibliography::</span>
+<span class="sd">            :filter: key == "coleri2002channel"</span>
+<span class="sd">            :list: bullet</span>
+
+<span class="sd">    .. rubric:: TL;DR</span>
+
+<span class="sd">    The input pilot estimates are grouped by transmit stream and pilot-bearing</span>
+<span class="sd">    OFDM symbol. For each group, the channel is reconstructed across frequency</span>
+<span class="sd">    using one of four methods:</span>
+
+<span class="sd">    - ``"second-order"`` applies a local second-order interpolation rule.</span>
+<span class="sd">    - ``"low-pass"`` inserts zeros between pilot estimates and applies a symmetric</span>
+<span class="sd">      low-pass FIR interpolation filter.</span>
+<span class="sd">    - ``"cubic-spline"`` applies cubic-spline interpolation using.</span>
+<span class="sd">    - ``"time-domain"`` transforms the pilot sequence to the delay domain, inserts</span>
+<span class="sd">      zeros in the middle of the FFT-ordered delay vector, and transforms it back</span>
+<span class="sd">      to the complete effective-subcarrier grid.</span>
+
+<span class="sd">    After frequency reconstruction, all methods apply linear interpolation between</span>
+<span class="sd">    pilot-bearing OFDM symbols.</span>
+
+<span class="sd">    .. rubric:: Supported System Geometry</span>
+
+<span class="sd">    The interpolator supports different effective FFT sizes, OFDM-symbol counts,</span>
+<span class="sd">    transmit-stream counts, and receive-antenna counts, provided that:</span>
+
+<span class="sd">    - Each pilot group forms a uniform comb over subcarriers.</span>
+<span class="sd">    - All pilot groups have the same comb spacing and number of pilots.</span>
+<span class="sd">    - Each comb spans the complete effective-subcarrier grid, such that</span>
+<span class="sd">      ``num_effective_subcarriers == pilot_spacing * num_pilots_per_symbol``.</span>
+<span class="sd">    - Every transmit stream has the same number of pilot-bearing OFDM symbols.</span>
+
+<span class="sd">    Different comb offsets between transmit streams are supported. Nonuniform,</span>
+<span class="sd">    incomplete, or inconsistent comb layouts are rejected during construction.</span>
+
+<span class="sd">    .. rubric:: Deviations from the Paper</span>
+
+<span class="sd">    - The paper formulates its interpolation methods independently for each OFDM</span>
+<span class="sd">      symbol. This implementation additionally applies linear interpolation over</span>
+<span class="sd">      OFDM time when pilots occupy only a subset of the OFDM symbols.</span>
+<span class="sd">    - The paper does not fully specify frequency-boundary behavior. Second-order</span>
+<span class="sd">      and low-pass interpolation therefore use constant edge extension, while</span>
+<span class="sd">      cubic-spline queries outside the observed pilot span are clipped to the</span>
+<span class="sd">      nearest edge.</span>
+<span class="sd">    - The low-pass implementation follows the publicly documented MATLAB</span>
+<span class="sd">      ``interp``/``intfilt`` construction but is not claimed to reproduce its</span>
+<span class="sd">      internal implementation bit for bit.</span>
+<span class="sd">    - Equation (19) is evaluated using the normalized interval coordinate</span>
+<span class="sd">      :math:`l/L`, consistently with Equation (18), instead of the printed</span>
+<span class="sd">      :math:`l/N`.</span>
+<span class="sd">    - The printed zero-padding expression in Equation (21) is inconsistent. The</span>
+<span class="sd">      time-domain method follows the surrounding description and Figure 3:</span>
+<span class="sd">      pilot-rate IDFT, middle zero padding, and a DFT over all effective</span>
+<span class="sd">      subcarriers.</span>
+<span class="sd">    - The paper does not define detector-facing channel-estimation error</span>
+<span class="sd">      variances. This implementation expands the mean pilot-domain LS variance</span>
+<span class="sd">      over frequency, interpolates it over OFDM time, and applies</span>
+<span class="sd">      ``err_var_scale``.</span>
+
+<span class="sd">    :param pilot_pattern: Pilot pattern defining the active comb-pilot positions.</span>
+<span class="sd">    :param method: Frequency-interpolation method. Must be ``"second-order"``,</span>
+<span class="sd">        ``"low-pass"``, ``"cubic-spline"``, or ``"time-domain"``.</span>
+<span class="sd">    :param lowpass_filter_half_length: Half-length parameter of the</span>
+<span class="sd">        MATLAB-style low-pass interpolation filter. The resulting FIR length is</span>
+<span class="sd">        ``2 * lowpass_filter_half_length * pilot_spacing + 1``. This parameter is</span>
+<span class="sd">        used only by ``method="low-pass"``.</span>
+<span class="sd">    :param lowpass_cutoff: Normalized cutoff of the low-pass interpolation filter,</span>
+<span class="sd">        expressed as a fraction of the input Nyquist frequency. It must lie in</span>
+<span class="sd">        `(0, 1]` and is used only by ``method="low-pass"``.</span>
+<span class="sd">    :param err_var_scale: Non-negative scale applied to the reconstructed</span>
+<span class="sd">        detector-facing error variances.</span>
+<span class="sd">    :param precision: Precision used for internal calculations and outputs. If</span>
+<span class="sd">        `None`, :attr:`~sionna.phy.config.Config.precision` is used.</span>
+<span class="sd">    :param device: Device used for tensor operations. If `None`,</span>
+<span class="sd">        :attr:`~sionna.phy.config.Config.device` is used.</span>
+
+<span class="sd">    :input h_hat: [batch_size, num_rx, num_rx_ant, num_tx,</span>
+<span class="sd">        num_streams_per_tx, num_pilot_symbols], `torch.complex`.</span>
+<span class="sd">        Channel estimates at the active pilot positions.</span>
+<span class="sd">    :input err_var: [batch_size, num_rx, num_rx_ant, num_tx,</span>
+<span class="sd">        num_streams_per_tx, num_pilot_symbols], `torch.float`.</span>
+<span class="sd">        Corresponding pilot-domain channel-estimation error variances.</span>
+
+<span class="sd">    :output h_hat: [batch_size, num_rx, num_rx_ant, num_tx,</span>
+<span class="sd">        num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers],</span>
+<span class="sd">        `torch.complex`.</span>
+<span class="sd">        Channel estimates over the complete effective resource grid.</span>
+<span class="sd">    :output err_var: Same shape as ``h_hat``, `torch.float`.</span>
+<span class="sd">        Corresponding detector-facing channel-estimation error variances.</span>
+<span class="sd">    """</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pilot_pattern</span><span class="p">:</span> <span class="n">PilotPattern</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">METHOD_SECOND_ORDER</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">lowpass_filter_half_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="n">lowpass_cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.105</span><span class="p">,</span>
+        <span class="n">err_var_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.868</span><span class="p">,</span>
+        <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Initialize the interpolator and cache comb-pilot layout data."""</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">METHOD_NAMES</span><span class="p">,</span> <span class="s2">"Unsupported Coleri interpolation method."</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">lowpass_filter_half_length</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">lowpass_filter_half_length</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">),</span> <span class="s2">"`lowpass_filter_half_length` must be a positive integer."</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lowpass_cutoff</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span>
+            <span class="n">lowpass_cutoff</span>
+        <span class="p">),</span> <span class="s2">"`lowpass_cutoff` must be finite."</span>
+        <span class="k">assert</span> <span class="mf">0.0</span> <span class="o">&lt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">lowpass_cutoff</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"`lowpass_cutoff` must be in (0, 1]."</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">err_var_scale</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span>
+            <span class="n">err_var_scale</span>
+        <span class="p">),</span> <span class="s2">"`err_var_scale` must be finite."</span>
+        <span class="k">assert</span> <span class="n">err_var_scale</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"`err_var_scale` must be non-negative."</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lowpass_filter_half_length</span> <span class="o">=</span> <span class="n">lowpass_filter_half_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lowpass_cutoff</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lowpass_cutoff</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_err_var_scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">err_var_scale</span><span class="p">)</span>
+
+        <span class="n">pilot_mask</span> <span class="o">=</span> <span class="n">pilot_pattern</span><span class="o">.</span><span class="n">mask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pilot_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_streams_per_tx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pilot_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_ofdm_symbols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pilot_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pilot_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_pilot_groups</span><span class="p">(</span>
+            <span class="n">pilot_pattern</span><span class="o">=</span><span class="n">pilot_pattern</span><span class="p">,</span>
+            <span class="n">group_over</span><span class="o">=</span><span class="p">(</span><span class="s2">"subcarrier"</span><span class="p">,),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_comb_layout</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">==</span> <span class="n">METHOD_LOWPASS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span>
+                <span class="s2">"_lowpass_coefficients"</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_design_lowpass_filter</span><span class="p">(),</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">==</span> <span class="n">METHOD_SPLINE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_spline_comb_offsets</span><span class="p">,</span> <span class="n">spline_weight_matrices</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_build_spline_weight_matrices</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span>
+                <span class="s2">"_spline_weight_matrices"</span><span class="p">,</span>
+                <span class="n">spline_weight_matrices</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_comb_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Validate the comb-pilot layout and cache stream group indices."""</span>
+        <span class="n">group_symbol_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_constant_coord</span><span class="p">(</span><span class="s2">"symbol"</span><span class="p">)</span>
+        <span class="n">group_tx_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_constant_coord</span><span class="p">(</span><span class="s2">"tx"</span><span class="p">)</span>
+        <span class="n">group_stream_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_constant_coord</span><span class="p">(</span><span class="s2">"stream"</span><span class="p">)</span>
+        <span class="n">group_subcarrier_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_varying_coord</span><span class="p">(</span><span class="s2">"subcarrier"</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_len</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">group_spacings</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_num_groups</span><span class="p">,),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">subcarrier_spacings</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">group_subcarrier_indices</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">group_spacings</span> <span class="o">=</span> <span class="n">subcarrier_spacings</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">same_spacing</span> <span class="o">=</span> <span class="n">subcarrier_spacings</span> <span class="o">==</span> <span class="n">group_spacings</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">bool</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">same_spacing</span><span class="p">)),</span> <span class="p">(</span>
+                <span class="s2">"Coleri interpolation requires uniform comb pilots."</span>
+            <span class="p">)</span>
+
+        <span class="n">unique_spacings</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">group_spacings</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">int</span><span class="p">(</span><span class="n">unique_spacings</span><span class="o">.</span><span class="n">numel</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">"Coleri interpolation requires a common comb spacing."</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">unique_spacings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilots_per_symbol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_len</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span> <span class="o">==</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilots_per_symbol</span>
+        <span class="p">),</span> <span class="s2">"Coleri interpolators require comb pilots to span the full grid."</span>
+
+        <span class="n">group_comb_offsets</span> <span class="o">=</span> <span class="n">group_subcarrier_indices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">num_streams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_streams_per_tx</span>
+        <span class="n">flat_stream_indices</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">group_tx_indices</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_streams_per_tx</span> <span class="o">+</span> <span class="n">group_stream_indices</span>
+        <span class="p">)</span>
+        <span class="n">group_counts_per_stream</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span>
+            <span class="n">flat_stream_indices</span><span class="p">,</span>
+            <span class="n">minlength</span><span class="o">=</span><span class="n">num_streams</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">bool</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">group_counts_per_stream</span> <span class="o">==</span> <span class="n">group_counts_per_stream</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="p">(</span>
+            <span class="s2">"Coleri interpolation requires equal pilot-symbol counts per stream."</span>
+        <span class="p">)</span>
+        <span class="n">num_pilot_symbols_per_stream</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">group_counts_per_stream</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="n">stream_group_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_group_num_groups</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_streams_per_tx</span><span class="p">,</span>
+            <span class="n">num_pilot_symbols_per_stream</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group_symbol_indices</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">symbol_index</span><span class="p">)</span> <span class="k">for</span> <span class="n">symbol_index</span> <span class="ow">in</span> <span class="n">group_symbol_indices</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group_comb_offsets</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">comb_offset</span><span class="p">)</span> <span class="k">for</span> <span class="n">comb_offset</span> <span class="ow">in</span> <span class="n">group_comb_offsets</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stream_group_indices</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="nb">tuple</span><span class="p">(</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">group_index</span><span class="p">)</span> <span class="k">for</span> <span class="n">group_index</span> <span class="ow">in</span> <span class="n">stream_indices</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+                <span class="k">for</span> <span class="n">stream_indices</span> <span class="ow">in</span> <span class="n">tx_indices</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">tx_indices</span> <span class="ow">in</span> <span class="n">stream_group_indices</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_design_lowpass_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return MATLAB ``interp``-style zero-insertion low-pass FIR taps."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">num_filter_taps</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lowpass_filter_half_length</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="p">)</span>
+
+        <span class="c1"># MATLAB `interp` treats `cutoff` relative to the input Nyquist rate.</span>
+        <span class="c1"># After zero insertion by `spacing`, the passband contracts by the same</span>
+        <span class="c1"># factor in the expanded-rate frequency axis.</span>
+        <span class="n">passband_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lowpass_cutoff</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span>
+        <span class="n">stopband_edge</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lowpass_cutoff</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span><span class="p">)</span>
+        <span class="n">filter_coefficients</span> <span class="o">=</span> <span class="n">firls</span><span class="p">(</span>
+            <span class="n">num_filter_taps</span><span class="p">,</span>
+            <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">passband_edge</span><span class="p">,</span> <span class="n">stopband_edge</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+            <span class="n">fs</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Enforce the Nyquist interpolation property explicitly: at original</span>
+        <span class="c1"># sample instants the FIR must pass the LS pilot through unchanged, and</span>
+        <span class="c1"># neighboring original-sample phases must not leak into it.</span>
+        <span class="n">center_tap</span> <span class="o">=</span> <span class="n">num_filter_taps</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="k">for</span> <span class="n">tap_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_filter_taps</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">tap_index</span> <span class="o">==</span> <span class="n">center_tap</span><span class="p">:</span>
+                <span class="n">filter_coefficients</span><span class="p">[</span><span class="n">tap_index</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">tap_index</span> <span class="o">-</span> <span class="n">center_tap</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">filter_coefficients</span><span class="p">[</span><span class="n">tap_index</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span>
+            <span class="n">filter_coefficients</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_spline_weight_matrices</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Precompute MATLAB-like cubic spline interpolation matrices."""</span>
+        <span class="n">spline_weight_matrices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">spline_comb_offsets</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_group_comb_offsets</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">comb_offset</span> <span class="ow">in</span> <span class="n">spline_comb_offsets</span><span class="p">:</span>
+            <span class="n">pilot_positions</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">comb_offset</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_pilots_per_symbol</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+                <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_pilots_per_symbol</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+            <span class="c1"># MATLAB `spline` uses a not-a-knot cubic spline by default. The</span>
+            <span class="c1"># paper does not state a periodic frequency boundary, so do not add</span>
+            <span class="c1"># a wrapped endpoint; instead, clip queries outside the observed</span>
+            <span class="c1"># pilot span below.</span>
+            <span class="n">spline</span> <span class="o">=</span> <span class="n">CubicSpline</span><span class="p">(</span>
+                <span class="n">pilot_positions</span><span class="p">,</span>
+                <span class="n">basis</span><span class="p">,</span>
+                <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">bc_type</span><span class="o">=</span><span class="s2">"not-a-knot"</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">subcarrier_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="c1"># Interpolation is along axis 0 of `basis`, the pilot-coordinate</span>
+            <span class="c1"># axis. The resulting matrix has shape [num_subcarriers,</span>
+            <span class="c1"># num_pilots_per_symbol].</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">spline</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">subcarrier_positions</span><span class="p">,</span> <span class="n">pilot_positions</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pilot_positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">)</span>
+            <span class="n">spline_weight_matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">spline_comb_offsets</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">spline_weight_matrices</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_zero_pad_middle</span><span class="p">(</span><span class="n">signal</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">target_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Insert zeros between nonnegative- and negative-delay bins."""</span>
+        <span class="n">source_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">source_size</span> <span class="o">==</span> <span class="n">target_size</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">signal</span>
+        <span class="c1"># The IDFT output uses FFT ordering. For even lengths, Eq. (21) defines</span>
+        <span class="c1"># M=N_p/2+1; the sample at N_p/2 therefore remains in the leading</span>
+        <span class="c1"># segment. The equation's printed case ranges are inconsistent, but</span>
+        <span class="c1"># this split implements its stated middle-zero-padding construction.</span>
+        <span class="k">if</span> <span class="n">source_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">split_index</span> <span class="o">=</span> <span class="n">source_size</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">split_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">source_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">padding_shape</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">target_size</span> <span class="o">-</span> <span class="n">source_size</span><span class="p">)</span>
+        <span class="n">zero_padding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="n">padding_shape</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">signal</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">split_index</span><span class="p">],</span>
+                <span class="n">zero_padding</span><span class="p">,</span>
+                <span class="n">signal</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">split_index</span><span class="p">:],</span>
+            <span class="p">],</span>
+            <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_interpolate_with_time_domain_transform</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pilot_values</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">comb_offset</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Interpolate pilots by zero-padding their time-domain transform."""</span>
+        <span class="c1"># Eq. (20): pilot-rate IDFT; Eq. (21): middle zero padding;</span>
+        <span class="c1"># Eq. (22): DFT back to all subcarriers. PyTorch's FFT scaling is used</span>
+        <span class="c1"># so that reconstructed values pass through the pilot samples.</span>
+        <span class="n">time_domain_pilot_signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">pilot_values</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">zero_padded_time_signal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_pad_middle</span><span class="p">(</span>
+            <span class="n">time_domain_pilot_signal</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">interpolated_values</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">zero_padded_time_signal</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">comb_offset</span><span class="p">:</span>
+            <span class="n">interpolated_values</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span>
+                <span class="n">interpolated_values</span><span class="p">,</span>
+                <span class="n">shifts</span><span class="o">=</span><span class="n">comb_offset</span><span class="p">,</span>
+                <span class="n">dims</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">interpolated_values</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_interpolate_with_second_order_polynomial</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pilot_values</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">comb_offset</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Interpolate pilots across frequency with a quadratic formula."""</span>
+        <span class="n">num_pilot_values</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">subcarrier_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">relative_subcarrier_indices</span> <span class="o">=</span> <span class="n">subcarrier_indices</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">comb_offset</span><span class="p">)</span>
+        <span class="n">raw_pilot_interval_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
+            <span class="n">relative_subcarrier_indices</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span><span class="p">,</span>
+            <span class="n">rounding_mode</span><span class="o">=</span><span class="s2">"floor"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">pilot_interval_indices</span> <span class="o">=</span> <span class="n">raw_pilot_interval_indices</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="n">num_pilot_values</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Eq. (19) is evaluated with the interpolation fraction over one pilot</span>
+        <span class="c1"># interval. Subcarriers before the first stream-specific pilot are held</span>
+        <span class="c1"># at the first pilot rather than wrapped to the last pilot.</span>
+        <span class="n">interpolation_fraction</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">relative_subcarrier_indices</span>
+            <span class="o">-</span> <span class="n">raw_pilot_interval_indices</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">interpolation_fraction</span> <span class="o">=</span> <span class="n">interpolation_fraction</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span><span class="p">)</span>
+        <span class="n">interpolation_fraction</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">relative_subcarrier_indices</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">interpolation_fraction</span><span class="p">),</span>
+            <span class="n">interpolation_fraction</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Constant edge extension implements max(index-1, 0) and</span>
+        <span class="c1"># min(index+1, num_pilots-1) for the neighbor pilots required by the</span>
+        <span class="c1"># quadratic formula.</span>
+        <span class="n">previous_pilot_values</span> <span class="o">=</span> <span class="n">pilot_values</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">pilot_interval_indices</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">current_pilot_values</span> <span class="o">=</span> <span class="n">pilot_values</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">pilot_interval_indices</span><span class="p">)</span>
+        <span class="n">next_pilot_values</span> <span class="o">=</span> <span class="n">pilot_values</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">pilot_interval_indices</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">max</span><span class="o">=</span><span class="n">num_pilot_values</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">previous_weight</span> <span class="o">=</span> <span class="n">interpolation_fraction</span> <span class="o">*</span> <span class="p">(</span><span class="n">interpolation_fraction</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">current_weight</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">interpolation_fraction</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">interpolation_fraction</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">next_weight</span> <span class="o">=</span> <span class="n">interpolation_fraction</span> <span class="o">*</span> <span class="p">(</span><span class="n">interpolation_fraction</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">weight_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">pilot_values</span><span class="o">.</span><span class="n">ndim</span>
+        <span class="n">weight_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">previous_pilot_values</span> <span class="o">*</span> <span class="n">previous_weight</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">current_pilot_values</span> <span class="o">*</span> <span class="n">current_weight</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">next_pilot_values</span> <span class="o">*</span> <span class="n">next_weight</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_interpolate_with_lowpass_filter</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pilot_values</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">comb_offset</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Interpolate pilots by zero insertion and low-pass FIR filtering."""</span>
+        <span class="n">lowpass_coefficients</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lowpass_coefficients</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">filter_padding</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lowpass_coefficients</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Work on an extended grid so convolution is finite at the resource-grid</span>
+        <span class="c1"># edges. The extra samples are only FIR context and are discarded by the</span>
+        <span class="c1"># valid convolution below.</span>
+        <span class="n">extended_samples</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="o">*</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">filter_padding</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">num_pilot_values</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">pilot_positions</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">comb_offset</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="n">num_pilot_values</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span>
+        <span class="n">extended_pilot_positions</span> <span class="o">=</span> <span class="n">pilot_positions</span> <span class="o">+</span> <span class="n">filter_padding</span>
+
+        <span class="c1"># MATLAB-style low-pass interpolation starts from zero insertion: real</span>
+        <span class="c1"># pilot locations hold LS estimates, and all intermediate subcarriers</span>
+        <span class="c1"># start at zero before FIR smoothing.</span>
+        <span class="n">extended_samples</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">extended_pilot_positions</span><span class="p">]</span> <span class="o">=</span> <span class="n">pilot_values</span>
+
+        <span class="c1"># Fill virtual comb pilots to the left with the first observed pilot.</span>
+        <span class="c1"># This supplies FIR context without circularly coupling the last pilot</span>
+        <span class="c1"># to the first pilot.</span>
+        <span class="n">left_context_positions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">comb_offset</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span><span class="p">,</span>
+            <span class="o">-</span><span class="n">filter_padding</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">left_context_positions</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">extended_samples</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">left_context_positions</span> <span class="o">+</span> <span class="n">filter_padding</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">pilot_values</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Same constant extension on the right edge, using the last observed</span>
+        <span class="c1"># pilot as virtual FIR context.</span>
+        <span class="n">right_context_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">comb_offset</span><span class="p">)</span> <span class="o">+</span> <span class="n">num_pilot_values</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span>
+        <span class="n">right_context_positions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="n">right_context_start</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span> <span class="o">+</span> <span class="n">filter_padding</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_spacing</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">right_context_positions</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">extended_samples</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">right_context_positions</span> <span class="o">+</span> <span class="n">filter_padding</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">pilot_values</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="p">)</span>
+
+        <span class="c1"># `conv1d` computes correlation, so flip the FIR to implement</span>
+        <span class="c1"># convolution. Flattening lets the same FIR run independently over all</span>
+        <span class="c1"># batch, receive, antenna, tx, and stream dimensions.</span>
+        <span class="n">flattened_samples</span> <span class="o">=</span> <span class="n">extended_samples</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">extended_samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">convolution_weight</span> <span class="o">=</span> <span class="n">lowpass_coefficients</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">filtered_samples</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span>
+            <span class="n">flattened_samples</span><span class="p">,</span>
+            <span class="n">convolution_weight</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span><span class="p">)</span>
+
+        <span class="c1"># Make pilot pass-through exact even if the least-squares FIR has tiny</span>
+        <span class="c1"># numerical deviations from the intended Nyquist property.</span>
+        <span class="n">filtered_samples</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">pilot_positions</span><span class="p">]</span> <span class="o">=</span> <span class="n">pilot_values</span>
+        <span class="k">return</span> <span class="n">filtered_samples</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_interpolate_with_cubic_spline</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pilot_values</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">comb_offset</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Interpolate pilots across frequency with cubic-spline weights."""</span>
+        <span class="n">spline_matrix_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spline_comb_offsets</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">comb_offset</span><span class="p">)</span>
+        <span class="n">spline_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spline_weight_matrices</span><span class="p">[</span><span class="n">spline_matrix_index</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># The precomputed matrix is real and linear, so applying it directly to</span>
+        <span class="c1"># complex pilots is equivalent to interpolating real and imaginary parts</span>
+        <span class="c1"># with the same cubic spline weights.</span>
+        <span class="k">return</span> <span class="n">pilot_values</span> <span class="o">@</span> <span class="n">spline_weights</span><span class="o">.</span><span class="n">t</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">pilot_values</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_interpolate_frequency</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pilot_values</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">group_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Apply the configured frequency interpolation to one pilot group."""</span>
+        <span class="n">comb_offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group_comb_offsets</span><span class="p">[</span><span class="n">group_index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">==</span> <span class="n">METHOD_TIME_DOMAIN</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpolate_with_time_domain_transform</span><span class="p">(</span><span class="n">pilot_values</span><span class="p">,</span> <span class="n">comb_offset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">==</span> <span class="n">METHOD_SECOND_ORDER</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpolate_with_second_order_polynomial</span><span class="p">(</span><span class="n">pilot_values</span><span class="p">,</span> <span class="n">comb_offset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">==</span> <span class="n">METHOD_LOWPASS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpolate_with_lowpass_filter</span><span class="p">(</span><span class="n">pilot_values</span><span class="p">,</span> <span class="n">comb_offset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">==</span> <span class="n">METHOD_SPLINE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpolate_with_cubic_spline</span><span class="p">(</span><span class="n">pilot_values</span><span class="p">,</span> <span class="n">comb_offset</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"unknown Coleri interpolation method: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_method</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_interpolate_time</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">symbol_values</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+        <span class="n">pilot_symbol_indices</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Linearly interpolate reconstructed pilot symbols over OFDM time."""</span>
+        <span class="c1"># Time interpolation is fixed to linear interpolation between the</span>
+        <span class="c1"># nearest pilot-bearing OFDM symbols.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pilot_symbol_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">symbol_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+                <span class="o">*</span><span class="n">symbol_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_num_ofdm_symbols</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">stacked_values</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">symbol_values</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">pilot_symbol_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+            <span class="n">pilot_symbol_indices</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">stacked_values</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">output_symbol_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_ofdm_symbols</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">stacked_values</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">right_symbol_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span>
+            <span class="n">pilot_symbol_indices</span><span class="p">,</span>
+            <span class="n">output_symbol_indices</span><span class="p">,</span>
+            <span class="n">right</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">left_symbol_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">right_symbol_indices</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">right_symbol_indices</span><span class="p">),</span>
+            <span class="n">right_symbol_indices</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">right_symbol_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">right_symbol_indices</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">right_symbol_indices</span><span class="p">),</span>
+            <span class="n">right_symbol_indices</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">right_symbol_indices_past_end</span> <span class="o">=</span> <span class="n">right_symbol_indices</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">pilot_symbol_indices</span>
+        <span class="p">)</span>
+        <span class="n">left_symbol_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">right_symbol_indices_past_end</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">left_symbol_indices</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pilot_symbol_indices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">left_symbol_indices</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">right_symbol_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">right_symbol_indices_past_end</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">right_symbol_indices</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pilot_symbol_indices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">right_symbol_indices</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">left_symbols</span> <span class="o">=</span> <span class="n">pilot_symbol_indices</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">left_symbol_indices</span><span class="p">)</span>
+        <span class="n">right_symbols</span> <span class="o">=</span> <span class="n">pilot_symbol_indices</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">right_symbol_indices</span><span class="p">)</span>
+        <span class="n">interpolation_weights</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">output_symbol_indices</span> <span class="o">-</span> <span class="n">left_symbols</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">stacked_values</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="o">/</span> <span class="p">(</span><span class="n">right_symbols</span> <span class="o">-</span> <span class="n">left_symbols</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">stacked_values</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">weight_shape</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="n">stacked_values</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_ofdm_symbols</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">interpolation_weights</span> <span class="o">=</span> <span class="n">interpolation_weights</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">)</span>
+
+        <span class="n">left_values</span> <span class="o">=</span> <span class="n">stacked_values</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">left_symbol_indices</span><span class="p">)</span>
+        <span class="n">right_values</span> <span class="o">=</span> <span class="n">stacked_values</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">right_symbol_indices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">left_values</span> <span class="o">+</span> <span class="n">interpolation_weights</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">right_values</span> <span class="o">-</span> <span class="n">left_values</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_interpolate_error_variance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pilot_error_variances</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Expand pilot error variances across all subcarriers."""</span>
+        <span class="c1"># Coleri does not derive detector-facing variances. Propagate the</span>
+        <span class="c1"># Sionna LS pilot variance as a scalar per reconstructed symbol,</span>
+        <span class="c1"># matching the LS baseline observation model without tuning a</span>
+        <span class="c1"># confidence scale.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_err_var_scale</span> <span class="o">*</span> <span class="n">pilot_error_variances</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+            <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">*</span><span class="n">pilot_error_variances</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">h_hat</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">err_var</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Interpolate pilot-domain estimates over the resource grid."""</span>
+        <span class="n">output_shape</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="o">*</span><span class="n">h_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_ofdm_symbols</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_subcarriers</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">channel_estimates</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+            <span class="n">output_shape</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">h_hat</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">h_hat</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">error_variances</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+            <span class="n">output_shape</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">err_var</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">err_var</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">grouped_channel_estimates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gather_pilot_groups</span><span class="p">(</span><span class="n">h_hat</span><span class="p">)</span>
+        <span class="n">grouped_error_variances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gather_pilot_groups</span><span class="p">(</span><span class="n">err_var</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">tx_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">stream_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_streams_per_tx</span><span class="p">):</span>
+                <span class="n">stream_group_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_group_indices</span><span class="p">[</span><span class="n">tx_index</span><span class="p">][</span><span class="n">stream_index</span><span class="p">]</span>
+                <span class="n">pilot_symbol_indices</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_group_symbol_indices</span><span class="p">[</span><span class="n">group_index</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">group_index</span> <span class="ow">in</span> <span class="n">stream_group_indices</span>
+                <span class="p">)</span>
+                <span class="n">channel_values_by_symbol</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">error_variances_by_symbol</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">for</span> <span class="n">group_index</span> <span class="ow">in</span> <span class="n">stream_group_indices</span><span class="p">:</span>
+                    <span class="n">group_pilot_estimates</span> <span class="o">=</span> <span class="n">grouped_channel_estimates</span><span class="p">[</span>
+                        <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">group_index</span><span class="p">,</span> <span class="p">:</span>
+                    <span class="p">]</span>
+                    <span class="n">channel_values_by_symbol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_interpolate_frequency</span><span class="p">(</span>
+                            <span class="n">group_pilot_estimates</span><span class="p">,</span>
+                            <span class="n">group_index</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+                    <span class="n">group_error_variances</span> <span class="o">=</span> <span class="n">grouped_error_variances</span><span class="p">[</span>
+                        <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">group_index</span><span class="p">,</span> <span class="p">:</span>
+                    <span class="p">]</span>
+                    <span class="n">error_variances_by_symbol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_interpolate_error_variance</span><span class="p">(</span><span class="n">group_error_variances</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+                <span class="n">channel_values_by_symbol</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">channel_values_by_symbol</span><span class="p">)</span>
+                <span class="n">error_variances_by_symbol</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">error_variances_by_symbol</span><span class="p">)</span>
+                <span class="n">channel_estimates</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">tx_index</span><span class="p">,</span> <span class="n">stream_index</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_interpolate_time</span><span class="p">(</span>
+                        <span class="n">channel_values_by_symbol</span><span class="p">,</span>
+                        <span class="n">pilot_symbol_indices</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">error_variances</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">tx_index</span><span class="p">,</span> <span class="n">stream_index</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_interpolate_time</span><span class="p">(</span>
+                        <span class="n">error_variances_by_symbol</span><span class="p">,</span>
+                        <span class="n">pilot_symbol_indices</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">channel_estimates</span><span class="p">,</span> <span class="n">error_variances</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">LSCombEstimator</span><span class="p">(</span><span class="n">LSChannelEstimator</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Least-squares comb-pilot channel estimator from Coleri et al. 2002.</span>
+
+<span class="sd">    The estimator first applies LS channel estimation at the nonzero comb-pilot</span>
+<span class="sd">    positions. The pilot-domain channel estimates and error variances are then</span>
+<span class="sd">    interpolated across the resource grid with :class:`CombInterpolator`.</span>
+
+<span class="sd">    For the pilot positions, the same observation model as</span>
+<span class="sd">    :class:`~sionna.phy.ofdm.LSChannelEstimator` is used:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        y_i = h_i p_i + n_i</span>
+
+<span class="sd">    where :math:`p_i` is a nonzero pilot symbol and :math:`n_i` has variance</span>
+<span class="sd">    :math:`N_0`. The pilot-domain estimate and error variance are</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \hat{h}_i = \frac{y_i}{p_i}, \qquad</span>
+<span class="sd">        \sigma_i^2 = \frac{N_0}{\left|p_i\right|^2}.</span>
+
+<span class="sd">    The supported interpolation methods are ``"second-order"``,</span>
+<span class="sd">    ``"low-pass"``, ``"cubic-spline"``, and ``"time-domain"``.</span>
+
+<span class="sd">    :param resource_grid: Resource grid.</span>
+<span class="sd">    :param method: Coleri interpolation method.</span>
+<span class="sd">    :param lowpass_filter_half_length: Half the number of input pilot samples</span>
+<span class="sd">        used by the MATLAB ``interp``-style low-pass FIR design. This argument</span>
+<span class="sd">        is only used for ``method="low-pass"``.</span>
+<span class="sd">    :param lowpass_cutoff: Normalized low-pass cutoff for the MATLAB</span>
+<span class="sd">        ``interp``-style FIR design. It is only used for</span>
+<span class="sd">        ``method="low-pass"`` and must be in `(0, 1]`.</span>
+<span class="sd">    :param err_var_scale: Non-negative scale applied to the detector-facing LS</span>
+<span class="sd">        error-variance fallback after interpolation.</span>
+<span class="sd">    :param precision: Precision used for internal calculations and outputs.</span>
+<span class="sd">        If set to `None`,</span>
+<span class="sd">        :attr:`~sionna.phy.config.Config.precision` is used.</span>
+<span class="sd">    :param device: Device for tensor operations. If `None`,</span>
+<span class="sd">        :attr:`~sionna.phy.config.Config.device` is used.</span>
+
+<span class="sd">    :input y: [batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size],</span>
+<span class="sd">        `torch.complex`.</span>
+<span class="sd">        Observed resource grid.</span>
+<span class="sd">    :input no: [batch_size, num_rx, num_rx_ant] or only the first n&gt;=0 dims,</span>
+<span class="sd">        `torch.float`.</span>
+<span class="sd">        Variance of the AWGN.</span>
+
+<span class="sd">    :output h_hat: [batch_size, num_rx, num_rx_ant, num_tx,</span>
+<span class="sd">        num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], `torch.complex`.</span>
+<span class="sd">        Channel estimates across the entire resource grid.</span>
+<span class="sd">    :output err_var: Same shape as ``h_hat``, `torch.float`.</span>
+<span class="sd">        Channel estimation error variance across the entire resource grid.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource_grid</span><span class="p">:</span> <span class="n">ResourceGrid</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">METHOD_SECOND_ORDER</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">lowpass_filter_half_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="n">lowpass_cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.105</span><span class="p">,</span>
+        <span class="n">err_var_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.868</span><span class="p">,</span>
+        <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Initialize LS pilot estimation with a Coleri interpolator."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lowpass_filter_half_length</span> <span class="o">=</span> <span class="n">lowpass_filter_half_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lowpass_cutoff</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lowpass_cutoff</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_err_var_scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">err_var_scale</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">resource_grid</span><span class="o">=</span><span class="n">resource_grid</span><span class="p">,</span>
+            <span class="n">interpolator</span><span class="o">=</span><span class="n">CombInterpolator</span><span class="p">(</span>
+                <span class="n">resource_grid</span><span class="o">.</span><span class="n">pilot_pattern</span><span class="p">,</span>
+                <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+                <span class="n">lowpass_filter_half_length</span><span class="o">=</span><span class="n">lowpass_filter_half_length</span><span class="p">,</span>
+                <span class="n">lowpass_cutoff</span><span class="o">=</span><span class="n">lowpass_cutoff</span><span class="p">,</span>
+                <span class="n">err_var_scale</span><span class="o">=</span><span class="n">err_var_scale</span><span class="p">,</span>
+                <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

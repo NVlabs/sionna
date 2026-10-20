@@ -1,0 +1,1244 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sionna.bench.mimo_ofdm_chest.papers.baur2022.tuning &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css?v=cffce40c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/leaderboard/styles.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../../../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sionna/bench/mimo_ofdm_chest/papers/baur2022/tuning';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <script type="module" src="../../../../../../_static/leaderboard/app.js"></script>
+    <link rel="canonical" href="/sionna/_modules/sionna/bench/mimo_ofdm_chest/papers/baur2022/tuning.html" />
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../../../../../../_static/searchtools.js"></script>
+    <script src="../../../../../../_static/language_data.js"></script>
+    <script src="../../../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../bench/index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../bench/index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sionna.bench.mimo_ofdm_chest.papers.baur2022.tuning</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sionna.bench.mimo_ofdm_chest.papers.baur2022.tuning</h1><div class="highlight"><pre>
+<span></span><span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.bench.mimo_ofdm_chest.benchmarking</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">build_cached_detector_scale_objective</span><span class="p">,</span>
+    <span class="n">build_cached_nmse_objective</span><span class="p">,</span>
+    <span class="n">build_resource_grid</span><span class="p">,</span>
+    <span class="n">tune_channel_estimator</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.bench.mimo_ofdm_chest.benchmarking.result_store</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">resolve_callable_arguments</span><span class="p">,</span>
+    <span class="n">resolve_constructor_arguments</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.bench.mimo_ofdm_chest.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">umi_3gpp_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.bench.mimo_ofdm_chest.persistence</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_json_atomic</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.asset</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_model</span><span class="p">,</span> <span class="n">load_training_data</span><span class="p">,</span> <span class="n">train_model</span><span class="p">,</span> <span class="n">METHOD_NOISY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.estimator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">COVARIANCE_FULL</span><span class="p">,</span>
+    <span class="n">VAEChannelEstimator</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"run_tuning"</span><span class="p">]</span>
+
+<span class="n">TUNING_EBNO_DBS</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+<span class="n">TUNING_SNR_WEIGHTS</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+    <span class="mf">10.0</span> <span class="o">**</span> <span class="p">(</span><span class="n">ebno_db</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">ebno_db</span> <span class="ow">in</span> <span class="n">TUNING_EBNO_DBS</span>
+<span class="p">)</span>
+<span class="n">DETECTOR_CALIBRATION_EBNO_DBS</span> <span class="o">=</span> <span class="p">(</span><span class="mf">10.0</span><span class="p">,)</span>
+
+<span class="n">ALGORITHM_SAMPLER_SEED</span> <span class="o">=</span> <span class="mi">123</span>
+<span class="n">ALGORITHM_PROBE_SEED</span> <span class="o">=</span> <span class="mi">4242</span>
+<span class="n">ALGORITHM_VALIDATION_SEED</span> <span class="o">=</span> <span class="mi">314159</span>
+<span class="n">VARIANCE_SAMPLER_SEED</span> <span class="o">=</span> <span class="mi">456</span>
+<span class="n">VARIANCE_PROBE_SEED</span> <span class="o">=</span> <span class="mi">271828</span>
+<span class="n">VARIANCE_VALIDATION_SEED</span> <span class="o">=</span> <span class="mi">161803</span>
+
+<span class="n">TRAIN_BATCHES</span> <span class="o">=</span> <span class="mi">400</span>
+<span class="n">TRAIN_BATCH_SIZE</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">VALIDATION_BATCHES</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">VALIDATION_BATCH_SIZE</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">MAX_EPOCHS</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">PATIENCE_EPOCHS</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">RELATIVE_MIN_DELTA</span> <span class="o">=</span> <span class="mf">1e-4</span>
+<span class="n">MODEL_SEED</span> <span class="o">=</span> <span class="n">umi_3gpp_config</span><span class="o">.</span><span class="n">seed</span>
+<span class="n">COVARIANCE_FLOOR</span> <span class="o">=</span> <span class="mf">1e-5</span>
+<span class="n">COVARIANCE_MODE</span> <span class="o">=</span> <span class="n">COVARIANCE_FULL</span>
+
+<span class="n">TRAINING_TUNING_OUTPUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"tuning/mimo_ofdm_chest/baur2022/training_v2"</span><span class="p">)</span>
+<span class="n">VARIANCE_TUNING_OUTPUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"tuning/mimo_ofdm_chest/baur2022/variance_scale_v2"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_training_recipe</span><span class="p">(</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
+    <span class="n">training_snr_dbs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Return the fixed full-effort VAE-noisy training recipe."""</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"method"</span><span class="p">:</span> <span class="n">METHOD_NOISY</span><span class="p">,</span>
+        <span class="s2">"latent_dim"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"latent_dim"</span><span class="p">]),</span>
+        <span class="s2">"train_batches"</span><span class="p">:</span> <span class="n">TRAIN_BATCHES</span><span class="p">,</span>
+        <span class="s2">"train_batch_size"</span><span class="p">:</span> <span class="n">TRAIN_BATCH_SIZE</span><span class="p">,</span>
+        <span class="s2">"validation_batches"</span><span class="p">:</span> <span class="n">VALIDATION_BATCHES</span><span class="p">,</span>
+        <span class="s2">"validation_batch_size"</span><span class="p">:</span> <span class="n">VALIDATION_BATCH_SIZE</span><span class="p">,</span>
+        <span class="s2">"epochs"</span><span class="p">:</span> <span class="n">MAX_EPOCHS</span><span class="p">,</span>
+        <span class="s2">"optimizer_batch_size"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"optimizer_batch_size"</span><span class="p">]),</span>
+        <span class="s2">"learning_rate"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"learning_rate"</span><span class="p">]),</span>
+        <span class="s2">"free_bits"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"free_bits"</span><span class="p">]),</span>
+        <span class="s2">"min_train_seconds"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"patience_epochs"</span><span class="p">:</span> <span class="n">PATIENCE_EPOCHS</span><span class="p">,</span>
+        <span class="s2">"relative_min_delta"</span><span class="p">:</span> <span class="n">RELATIVE_MIN_DELTA</span><span class="p">,</span>
+        <span class="s2">"snr_specific_weights"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"training_snr_dbs"</span><span class="p">:</span> <span class="n">training_snr_dbs</span><span class="p">,</span>
+        <span class="s2">"covariance_floor"</span><span class="p">:</span> <span class="n">COVARIANCE_FLOOR</span><span class="p">,</span>
+        <span class="s2">"covariance_mode"</span><span class="p">:</span> <span class="n">COVARIANCE_MODE</span><span class="p">,</span>
+        <span class="s2">"seed"</span><span class="p">:</span> <span class="n">MODEL_SEED</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_training_bank</span><span class="p">(</span><span class="n">manifest_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">"""Load and validate the common all-SNR data bank once."""</span>
+    <span class="n">resource_grid</span> <span class="o">=</span> <span class="n">build_resource_grid</span><span class="p">(</span><span class="n">umi_3gpp_config</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">validated_path</span> <span class="o">=</span> <span class="n">load_training_data</span><span class="p">(</span>
+        <span class="n">resource_grid</span><span class="p">,</span>
+        <span class="n">umi_3gpp_config</span><span class="p">,</span>
+        <span class="n">train_batches</span><span class="o">=</span><span class="n">TRAIN_BATCHES</span><span class="p">,</span>
+        <span class="n">train_batch_size</span><span class="o">=</span><span class="n">TRAIN_BATCH_SIZE</span><span class="p">,</span>
+        <span class="n">validation_batches</span><span class="o">=</span><span class="n">VALIDATION_BATCHES</span><span class="p">,</span>
+        <span class="n">validation_batch_size</span><span class="o">=</span><span class="n">VALIDATION_BATCH_SIZE</span><span class="p">,</span>
+        <span class="n">training_snr_dbs</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">umi_3gpp_config</span><span class="o">.</span><span class="n">snr_db_range</span><span class="p">()),</span>
+        <span class="n">seed</span><span class="o">=</span><span class="n">MODEL_SEED</span><span class="p">,</span>
+        <span class="n">manifest_path</span><span class="o">=</span><span class="n">manifest_path</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">resource_grid</span><span class="p">,</span> <span class="n">validated_path</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_train_estimator_kwargs</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">resource_grid</span><span class="p">,</span>
+    <span class="n">training_data_manifest</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">asset_root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
+    <span class="n">training_snr_dbs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Train one VAE-noisy model bank and return inference arguments."""</span>
+    <span class="n">recipe</span> <span class="o">=</span> <span class="n">_training_recipe</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">training_snr_dbs</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">states</span><span class="p">,</span> <span class="n">noise_variances</span><span class="p">,</span> <span class="n">manifest_paths</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span>
+            <span class="n">resource_grid</span><span class="p">,</span>
+            <span class="n">umi_3gpp_config</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">recipe</span><span class="p">,</span>
+            <span class="n">training_data_manifest</span><span class="o">=</span><span class="n">training_data_manifest</span><span class="p">,</span>
+            <span class="n">asset_root</span><span class="o">=</span><span class="n">asset_root</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
+        <span class="n">states</span><span class="p">,</span> <span class="n">noise_variances</span><span class="p">,</span> <span class="n">manifest_paths</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span>
+            <span class="n">resource_grid</span><span class="p">,</span>
+            <span class="n">umi_3gpp_config</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">recipe</span><span class="p">,</span>
+            <span class="n">asset_root</span><span class="o">=</span><span class="n">asset_root</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"model_states"</span><span class="p">:</span> <span class="n">states</span><span class="p">,</span>
+        <span class="s2">"model_noise_variances"</span><span class="p">:</span> <span class="n">noise_variances</span><span class="p">,</span>
+        <span class="s2">"num_rx_ant"</span><span class="p">:</span> <span class="n">umi_3gpp_config</span><span class="o">.</span><span class="n">num_rx_ant</span><span class="p">,</span>
+        <span class="s2">"latent_dim"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"latent_dim"</span><span class="p">]),</span>
+        <span class="s2">"covariance_floor"</span><span class="p">:</span> <span class="n">COVARIANCE_FLOOR</span><span class="p">,</span>
+        <span class="s2">"covariance_mode"</span><span class="p">:</span> <span class="n">COVARIANCE_MODE</span><span class="p">,</span>
+        <span class="s2">"interpolation_type"</span><span class="p">:</span> <span class="s2">"lin_time_avg"</span><span class="p">,</span>
+    <span class="p">},</span> <span class="n">manifest_paths</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_suggest_training_parameters</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">resource_grid</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Suggest the v2 VAE architecture and optimizer settings."""</span>
+    <span class="k">del</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">resource_grid</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"latent_dim"</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_categorical</span><span class="p">(</span><span class="s2">"latent_dim"</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">]),</span>
+        <span class="s2">"learning_rate"</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
+            <span class="s2">"learning_rate"</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
+        <span class="s2">"free_bits"</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span><span class="s2">"free_bits"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+        <span class="s2">"optimizer_batch_size"</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_categorical</span><span class="p">(</span>
+            <span class="s2">"optimizer_batch_size"</span><span class="p">,</span> <span class="p">[</span><span class="mi">256</span><span class="p">,</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">2048</span><span class="p">]</span>
+        <span class="p">),</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_suggest_err_var_scale</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">resource_grid</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Suggest only the detector-facing posterior-variance scale."""</span>
+    <span class="k">del</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">resource_grid</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"err_var_scale"</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
+            <span class="s2">"err_var_scale"</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_round_training_parameters</span><span class="p">(</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Round continuous winner parameters to three significant digits."""</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"latent_dim"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"latent_dim"</span><span class="p">]),</span>
+        <span class="s2">"learning_rate"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s1">'learning_rate'</span><span class="p">])</span><span class="si">:</span><span class="s2">.3g</span><span class="si">}</span><span class="s2">"</span><span class="p">),</span>
+        <span class="s2">"free_bits"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s1">'free_bits'</span><span class="p">])</span><span class="si">:</span><span class="s2">.3g</span><span class="si">}</span><span class="s2">"</span><span class="p">),</span>
+        <span class="s2">"optimizer_batch_size"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"optimizer_batch_size"</span><span class="p">]),</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_best_params</span><span class="p">(</span><span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Load the raw Optuna winner from one study summary."""</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"best_params.json"</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="s2">"best_params"</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_write_validation</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Write and return one paired-validation result."""</span>
+    <span class="n">write_json_atomic</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"paired_validation.json"</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_selected_training_parameters</span><span class="p">(</span>
+    <span class="n">algorithm_output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Return the training recipe selected by paired validation."""</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">algorithm_output_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"paired_validation.json"</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Baur paired validation is required before calibration: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">."</span>
+        <span class="p">)</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="s2">"selected_parameters"</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_training_tuning</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">n_trials</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_mc_batches</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">asset_root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">training_data_manifest</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Tune five full-effort SNR-specific VAE-noisy models per trial."""</span>
+    <span class="n">resource_grid</span><span class="p">,</span> <span class="n">validated_data_path</span> <span class="o">=</span> <span class="n">_load_training_bank</span><span class="p">(</span>
+        <span class="n">training_data_manifest</span>
+    <span class="p">)</span>
+    <span class="n">objective</span> <span class="o">=</span> <span class="n">build_cached_nmse_objective</span><span class="p">(</span>
+        <span class="n">VAEChannelEstimator</span><span class="p">,</span>
+        <span class="n">umi_3gpp_config</span><span class="p">,</span>
+        <span class="n">ebno_dbs</span><span class="o">=</span><span class="n">TUNING_EBNO_DBS</span><span class="p">,</span>
+        <span class="n">snr_weights</span><span class="o">=</span><span class="n">TUNING_SNR_WEIGHTS</span><span class="p">,</span>
+        <span class="n">num_mc_batches</span><span class="o">=</span><span class="n">num_mc_batches</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">resource_grid</span><span class="o">=</span><span class="n">resource_grid</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="n">ALGORITHM_PROBE_SEED</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">train_candidate</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">trial_resource_grid</span><span class="p">):</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">_suggest_training_parameters</span><span class="p">(</span>
+            <span class="n">trial</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">trial_resource_grid</span>
+        <span class="p">)</span>
+        <span class="n">estimator_kwargs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_train_estimator_kwargs</span><span class="p">(</span>
+            <span class="n">resource_grid</span><span class="o">=</span><span class="n">resource_grid</span><span class="p">,</span>
+            <span class="n">training_data_manifest</span><span class="o">=</span><span class="n">validated_data_path</span><span class="p">,</span>
+            <span class="n">asset_root</span><span class="o">=</span><span class="n">asset_root</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+            <span class="n">training_snr_dbs</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">TUNING_EBNO_DBS</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">estimator_kwargs</span>
+
+    <span class="k">return</span> <span class="n">tune_channel_estimator</span><span class="p">(</span>
+        <span class="n">VAEChannelEstimator</span><span class="p">,</span>
+        <span class="n">umi_3gpp_config</span><span class="p">,</span>
+        <span class="n">train_candidate</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="p">,</span>
+        <span class="n">ebno_dbs</span><span class="o">=</span><span class="n">TUNING_EBNO_DBS</span><span class="p">,</span>
+        <span class="n">snr_weights</span><span class="o">=</span><span class="n">TUNING_SNR_WEIGHTS</span><span class="p">,</span>
+        <span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span>
+        <span class="n">num_mc_batches</span><span class="o">=</span><span class="n">num_mc_batches</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">sampler_seed</span><span class="o">=</span><span class="n">ALGORITHM_SAMPLER_SEED</span><span class="p">,</span>
+        <span class="n">probe_seed</span><span class="o">=</span><span class="n">ALGORITHM_PROBE_SEED</span><span class="p">,</span>
+        <span class="n">estimator_objective</span><span class="o">=</span><span class="n">objective</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_training_validation</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">num_mc_batches</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">asset_root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">training_data_manifest</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Train and compare the rounded winner with the current full recipe."""</span>
+    <span class="n">resource_grid</span><span class="p">,</span> <span class="n">validated_data_path</span> <span class="o">=</span> <span class="n">_load_training_bank</span><span class="p">(</span>
+        <span class="n">training_data_manifest</span>
+    <span class="p">)</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">_load_best_params</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"current"</span><span class="p">:</span> <span class="n">resolve_callable_arguments</span><span class="p">(</span>
+            <span class="n">train_model</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="s2">"latent_dim"</span><span class="p">,</span>
+                <span class="s2">"learning_rate"</span><span class="p">,</span>
+                <span class="s2">"free_bits"</span><span class="p">,</span>
+                <span class="s2">"optimizer_batch_size"</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="s2">"rounded_winner"</span><span class="p">:</span> <span class="n">_round_training_parameters</span><span class="p">(</span><span class="n">raw</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">objective</span> <span class="o">=</span> <span class="n">build_cached_nmse_objective</span><span class="p">(</span>
+        <span class="n">VAEChannelEstimator</span><span class="p">,</span>
+        <span class="n">umi_3gpp_config</span><span class="p">,</span>
+        <span class="n">ebno_dbs</span><span class="o">=</span><span class="n">TUNING_EBNO_DBS</span><span class="p">,</span>
+        <span class="n">snr_weights</span><span class="o">=</span><span class="n">TUNING_SNR_WEIGHTS</span><span class="p">,</span>
+        <span class="n">num_mc_batches</span><span class="o">=</span><span class="n">num_mc_batches</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">resource_grid</span><span class="o">=</span><span class="n">resource_grid</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="n">ALGORITHM_VALIDATION_SEED</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">objectives</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">manifests</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">parameters</span> <span class="ow">in</span> <span class="n">candidates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">estimator_kwargs</span><span class="p">,</span> <span class="n">manifest_paths</span> <span class="o">=</span> <span class="n">_train_estimator_kwargs</span><span class="p">(</span>
+            <span class="n">resource_grid</span><span class="o">=</span><span class="n">resource_grid</span><span class="p">,</span>
+            <span class="n">training_data_manifest</span><span class="o">=</span><span class="n">validated_data_path</span><span class="p">,</span>
+            <span class="n">asset_root</span><span class="o">=</span><span class="n">asset_root</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+            <span class="n">training_snr_dbs</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">TUNING_EBNO_DBS</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">objectives</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">objective</span><span class="p">(</span><span class="n">estimator_kwargs</span><span class="p">)</span>
+        <span class="n">manifests</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">manifest_paths</span><span class="p">]</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">"rounded_winner"</span>
+        <span class="k">if</span> <span class="n">objectives</span><span class="p">[</span><span class="s2">"rounded_winner"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">objectives</span><span class="p">[</span><span class="s2">"current"</span><span class="p">]</span>
+        <span class="k">else</span> <span class="s2">"current"</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_write_validation</span><span class="p">(</span>
+        <span class="n">output_dir</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">"protocol_version"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">"metric"</span><span class="p">:</span> <span class="s2">"weighted_nmse"</span><span class="p">,</span>
+            <span class="s2">"ebno_dbs"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">TUNING_EBNO_DBS</span><span class="p">),</span>
+            <span class="s2">"snr_weights"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">TUNING_SNR_WEIGHTS</span><span class="p">),</span>
+            <span class="s2">"seed"</span><span class="p">:</span> <span class="n">ALGORITHM_VALIDATION_SEED</span><span class="p">,</span>
+            <span class="s2">"num_mc_batches_per_snr"</span><span class="p">:</span> <span class="n">num_mc_batches</span><span class="p">,</span>
+            <span class="s2">"batch_size"</span><span class="p">:</span> <span class="n">batch_size</span><span class="p">,</span>
+            <span class="s2">"raw_winner"</span><span class="p">:</span> <span class="n">raw</span><span class="p">,</span>
+            <span class="s2">"candidates"</span><span class="p">:</span> <span class="n">candidates</span><span class="p">,</span>
+            <span class="s2">"objectives"</span><span class="p">:</span> <span class="n">objectives</span><span class="p">,</span>
+            <span class="s2">"model_manifests"</span><span class="p">:</span> <span class="n">manifests</span><span class="p">,</span>
+            <span class="s2">"selected"</span><span class="p">:</span> <span class="n">selected</span><span class="p">,</span>
+            <span class="s2">"selected_parameters"</span><span class="p">:</span> <span class="n">candidates</span><span class="p">[</span><span class="n">selected</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_canonical_estimator_kwargs</span><span class="p">(</span>
+    <span class="n">asset_root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">algorithm_output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Load the final 11-SNR model bank selected by validation."""</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">_selected_training_parameters</span><span class="p">(</span><span class="n">algorithm_output_dir</span><span class="p">)</span>
+    <span class="n">resource_grid</span> <span class="o">=</span> <span class="n">build_resource_grid</span><span class="p">(</span><span class="n">umi_3gpp_config</span><span class="p">)</span>
+    <span class="n">states</span><span class="p">,</span> <span class="n">noise_variances</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span>
+        <span class="n">resource_grid</span><span class="p">,</span>
+        <span class="n">umi_3gpp_config</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">_training_recipe</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="p">,</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">umi_3gpp_config</span><span class="o">.</span><span class="n">snr_db_range</span><span class="p">()),</span>
+        <span class="p">),</span>
+        <span class="n">asset_root</span><span class="o">=</span><span class="n">asset_root</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"model_states"</span><span class="p">:</span> <span class="n">states</span><span class="p">,</span>
+        <span class="s2">"model_noise_variances"</span><span class="p">:</span> <span class="n">noise_variances</span><span class="p">,</span>
+        <span class="s2">"num_rx_ant"</span><span class="p">:</span> <span class="n">umi_3gpp_config</span><span class="o">.</span><span class="n">num_rx_ant</span><span class="p">,</span>
+        <span class="s2">"latent_dim"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">"latent_dim"</span><span class="p">]),</span>
+        <span class="s2">"covariance_floor"</span><span class="p">:</span> <span class="n">COVARIANCE_FLOOR</span><span class="p">,</span>
+        <span class="s2">"covariance_mode"</span><span class="p">:</span> <span class="n">COVARIANCE_MODE</span><span class="p">,</span>
+        <span class="s2">"interpolation_type"</span><span class="p">:</span> <span class="s2">"lin_time_avg"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_variance_objective</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">estimator_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
+    <span class="n">num_mc_batches</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the cached 10 dB codeword-BLER scale objective."""</span>
+    <span class="k">return</span> <span class="n">build_cached_detector_scale_objective</span><span class="p">(</span>
+        <span class="n">VAEChannelEstimator</span><span class="p">,</span>
+        <span class="n">umi_3gpp_config</span><span class="p">,</span>
+        <span class="n">estimator_kwargs</span><span class="p">,</span>
+        <span class="n">ebno_dbs</span><span class="o">=</span><span class="n">DETECTOR_CALIBRATION_EBNO_DBS</span><span class="p">,</span>
+        <span class="n">num_mc_batches</span><span class="o">=</span><span class="n">num_mc_batches</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+        <span class="n">detector_metric</span><span class="o">=</span><span class="s2">"bler"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_variance_calibration</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">n_trials</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_mc_batches</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">algorithm_output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">asset_root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Tune detector-facing variance scale for the frozen model bank."""</span>
+    <span class="n">estimator_kwargs</span> <span class="o">=</span> <span class="n">_load_canonical_estimator_kwargs</span><span class="p">(</span>
+        <span class="n">asset_root</span><span class="p">,</span> <span class="n">algorithm_output_dir</span>
+    <span class="p">)</span>
+    <span class="n">objective</span> <span class="o">=</span> <span class="n">_variance_objective</span><span class="p">(</span>
+        <span class="n">estimator_kwargs</span><span class="o">=</span><span class="n">estimator_kwargs</span><span class="p">,</span>
+        <span class="n">num_mc_batches</span><span class="o">=</span><span class="n">num_mc_batches</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="n">VARIANCE_PROBE_SEED</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">tune_channel_estimator</span><span class="p">(</span>
+        <span class="n">VAEChannelEstimator</span><span class="p">,</span>
+        <span class="n">umi_3gpp_config</span><span class="p">,</span>
+        <span class="n">_suggest_err_var_scale</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="p">,</span>
+        <span class="n">fixed_estimator_kwargs</span><span class="o">=</span><span class="n">estimator_kwargs</span><span class="p">,</span>
+        <span class="n">ebno_dbs</span><span class="o">=</span><span class="n">DETECTOR_CALIBRATION_EBNO_DBS</span><span class="p">,</span>
+        <span class="n">objective_metric</span><span class="o">=</span><span class="s2">"detector"</span><span class="p">,</span>
+        <span class="n">detector_metric</span><span class="o">=</span><span class="s2">"bler"</span><span class="p">,</span>
+        <span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span>
+        <span class="n">num_mc_batches</span><span class="o">=</span><span class="n">num_mc_batches</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">sampler_seed</span><span class="o">=</span><span class="n">VARIANCE_SAMPLER_SEED</span><span class="p">,</span>
+        <span class="n">probe_seed</span><span class="o">=</span><span class="n">VARIANCE_PROBE_SEED</span><span class="p">,</span>
+        <span class="n">estimator_objective</span><span class="o">=</span><span class="n">objective</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_variance_validation</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">num_mc_batches</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">algorithm_output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">asset_root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Paired-validate the rounded variance winner against the current scale."""</span>
+    <span class="n">estimator_kwargs</span> <span class="o">=</span> <span class="n">_load_canonical_estimator_kwargs</span><span class="p">(</span>
+        <span class="n">asset_root</span><span class="p">,</span> <span class="n">algorithm_output_dir</span>
+    <span class="p">)</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">_load_best_params</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"current"</span><span class="p">:</span> <span class="n">resolve_constructor_arguments</span><span class="p">(</span>
+            <span class="n">VAEChannelEstimator</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"err_var_scale"</span><span class="p">,),</span>
+        <span class="p">)[</span><span class="s2">"err_var_scale"</span><span class="p">],</span>
+        <span class="s2">"rounded_winner"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s1">'err_var_scale'</span><span class="p">])</span><span class="si">:</span><span class="s2">.3g</span><span class="si">}</span><span class="s2">"</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">objective</span> <span class="o">=</span> <span class="n">_variance_objective</span><span class="p">(</span>
+        <span class="n">estimator_kwargs</span><span class="o">=</span><span class="n">estimator_kwargs</span><span class="p">,</span>
+        <span class="n">num_mc_batches</span><span class="o">=</span><span class="n">num_mc_batches</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="n">VARIANCE_VALIDATION_SEED</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">objectives</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">objective</span><span class="p">({</span><span class="s2">"err_var_scale"</span><span class="p">:</span> <span class="n">scale</span><span class="p">})</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">scale</span> <span class="ow">in</span> <span class="n">candidates</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">"rounded_winner"</span>
+        <span class="k">if</span> <span class="n">objectives</span><span class="p">[</span><span class="s2">"rounded_winner"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">objectives</span><span class="p">[</span><span class="s2">"current"</span><span class="p">]</span>
+        <span class="k">else</span> <span class="s2">"current"</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_write_validation</span><span class="p">(</span>
+        <span class="n">output_dir</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">"protocol_version"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">"metric"</span><span class="p">:</span> <span class="s2">"codeword_bler"</span><span class="p">,</span>
+            <span class="s2">"ebno_dbs"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">DETECTOR_CALIBRATION_EBNO_DBS</span><span class="p">),</span>
+            <span class="s2">"seed"</span><span class="p">:</span> <span class="n">VARIANCE_VALIDATION_SEED</span><span class="p">,</span>
+            <span class="s2">"num_mc_batches_per_snr"</span><span class="p">:</span> <span class="n">num_mc_batches</span><span class="p">,</span>
+            <span class="s2">"batch_size"</span><span class="p">:</span> <span class="n">batch_size</span><span class="p">,</span>
+            <span class="s2">"raw_winner"</span><span class="p">:</span> <span class="n">raw</span><span class="p">,</span>
+            <span class="s2">"candidates"</span><span class="p">:</span> <span class="n">candidates</span><span class="p">,</span>
+            <span class="s2">"objectives"</span><span class="p">:</span> <span class="n">objectives</span><span class="p">,</span>
+            <span class="s2">"selected"</span><span class="p">:</span> <span class="n">selected</span><span class="p">,</span>
+            <span class="s2">"selected_scale"</span><span class="p">:</span> <span class="n">candidates</span><span class="p">[</span><span class="n">selected</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="run_tuning">
+<a class="viewcode-back" href="../../../../../../bench/benchmarks/mimo_ofdm_chest/estimators/latent_variable/sionna.bench.mimo_ofdm_chest.papers.baur2022.VAEChannelEstimator.html#sionna.bench.mimo_ofdm_chest.papers.baur2022.tuning.run_tuning">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_tuning</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">study</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"training"</span><span class="p">,</span>
+    <span class="n">n_trials</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">num_mc_batches</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">algorithm_output_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">asset_root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+    <span class="n">training_data_manifest</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+
+<span class="sd">    .. rubric:: Training Hyperparameter Tuning</span>
+
+<span class="sd">    The ``"training"`` stage minimizes weighted NMSE at -10, -5, 0, 5,</span>
+<span class="sd">    and 10 dB. It runs 10 seeded TPE trials. Every trial trains a separate</span>
+<span class="sd">    VAE model for each of these five SNRs and evaluates three batches of four</span>
+<span class="sd">    channels at each SNR.</span>
+
+<span class="sd">    All trials reuse the same training-data bank. Every SNR-specific model uses</span>
+<span class="sd">    6,400 training channels and 256 validation channels, at most 200 epochs,</span>
+<span class="sd">    patience of 20 epochs, and a relative minimum validation improvement of</span>
+<span class="sd">    1e-4. The best checkpoint is restored.</span>
+
+<span class="sd">    .. list-table::</span>
+<span class="sd">        :header-rows: 1</span>
+
+<span class="sd">        * - Parameter</span>
+<span class="sd">          - Search space</span>
+<span class="sd">        * - ``latent_dim``</span>
+<span class="sd">          - categorical set {4, 8, 16}</span>
+<span class="sd">        * - ``learning_rate``</span>
+<span class="sd">          - logarithmic from 1e-5 through 1e-3</span>
+<span class="sd">        * - ``free_bits``</span>
+<span class="sd">          - uniform from 0 through 1</span>
+<span class="sd">        * - ``optimizer_batch_size``</span>
+<span class="sd">          - categorical set {256, 512, 1024, 2048}</span>
+
+<span class="sd">    The ``"training-validation"`` stage retrains and compares the rounded</span>
+<span class="sd">    winner with the existing training defaults using 63 batches of four</span>
+<span class="sd">    channels at each SNR.</span>
+
+<span class="sd">    .. rubric:: Error-Variance Calibration</span>
+
+<span class="sd">    The ``"variance"`` stage tunes ``err_var_scale`` logarithmically from</span>
+<span class="sd">    1e-3 through 1 using 10 TPE trials. Codeword BLER is evaluated at 10 dB</span>
+<span class="sd">    over 63 batches of four channels using the frozen canonical model bank.</span>
+
+<span class="sd">    The ``"variance-validation"`` stage compares the rounded winner with the</span>
+<span class="sd">    existing scale.</span>
+
+<span class="sd">    :param study: Stage to execute: ``"training"``,</span>
+<span class="sd">        ``"training-validation"``, ``"variance"``, or</span>
+<span class="sd">        ``"variance-validation"``.</span>
+<span class="sd">    :param n_trials: Trial-count override. If `None`, use 10 for both training</span>
+<span class="sd">        tuning and variance calibration. Validation stages do not run Optuna</span>
+<span class="sd">        trials.</span>
+<span class="sd">    :param num_mc_batches: Monte Carlo budget override. If `None`, use three</span>
+<span class="sd">        batches per SNR for training tuning and 63 for validation and variance</span>
+<span class="sd">        calibration.</span>
+<span class="sd">    :param batch_size: Channels per evaluation batch. If `None`, use the</span>
+<span class="sd">        canonical configuration value of four.</span>
+<span class="sd">    :param output_dir: Output directory override for the selected stage.</span>
+<span class="sd">    :param algorithm_output_dir: Directory containing the training study and</span>
+<span class="sd">        paired-validation evidence used to select the canonical training recipe.</span>
+<span class="sd">    :param asset_root: External root containing or receiving trained VAE model</span>
+<span class="sd">        assets.</span>
+<span class="sd">    :param training_data_manifest: Manifest of the fixed training and validation</span>
+<span class="sd">        data bank. This is required by the training and training-validation</span>
+<span class="sd">        stages.</span>
+<span class="sd">    :returns: An Optuna study for tuning stages or a dictionary containing</span>
+<span class="sd">        paired-validation results for validation stages.</span>
+<span class="sd">    """</span>
+    <span class="n">effective_batch_size</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">umi_3gpp_config</span><span class="o">.</span><span class="n">batch_size</span> <span class="k">if</span> <span class="n">batch_size</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">algorithm_output_dir</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">TRAINING_TUNING_OUTPUT_DIR</span>
+        <span class="k">if</span> <span class="n">algorithm_output_dir</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="k">else</span> <span class="n">algorithm_output_dir</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">study</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"training"</span><span class="p">,</span> <span class="s2">"training-validation"</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">training_data_manifest</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"Baur training tuning requires `training_data_manifest`."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">study</span> <span class="o">==</span> <span class="s2">"training"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_run_training_tuning</span><span class="p">(</span>
+                <span class="n">n_trials</span><span class="o">=</span><span class="mi">10</span> <span class="k">if</span> <span class="n">n_trials</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">n_trials</span><span class="p">,</span>
+                <span class="n">num_mc_batches</span><span class="o">=</span><span class="mi">3</span> <span class="k">if</span> <span class="n">num_mc_batches</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">num_mc_batches</span><span class="p">,</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="n">effective_batch_size</span><span class="p">,</span>
+                <span class="n">output_dir</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">algorithm_output_dir</span> <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">output_dir</span>
+                <span class="p">),</span>
+                <span class="n">asset_root</span><span class="o">=</span><span class="n">asset_root</span><span class="p">,</span>
+                <span class="n">training_data_manifest</span><span class="o">=</span><span class="n">training_data_manifest</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_run_training_validation</span><span class="p">(</span>
+            <span class="n">num_mc_batches</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">umi_3gpp_config</span><span class="o">.</span><span class="n">num_mc_batches</span>
+                <span class="k">if</span> <span class="n">num_mc_batches</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="n">num_mc_batches</span>
+            <span class="p">),</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">effective_batch_size</span><span class="p">,</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">algorithm_output_dir</span> <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">output_dir</span>
+            <span class="p">),</span>
+            <span class="n">asset_root</span><span class="o">=</span><span class="n">asset_root</span><span class="p">,</span>
+            <span class="n">training_data_manifest</span><span class="o">=</span><span class="n">training_data_manifest</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">variance_output_dir</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">VARIANCE_TUNING_OUTPUT_DIR</span> <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">output_dir</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">study</span> <span class="o">==</span> <span class="s2">"variance"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_run_variance_calibration</span><span class="p">(</span>
+            <span class="n">n_trials</span><span class="o">=</span><span class="mi">10</span> <span class="k">if</span> <span class="n">n_trials</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">n_trials</span><span class="p">,</span>
+            <span class="n">num_mc_batches</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">umi_3gpp_config</span><span class="o">.</span><span class="n">num_mc_batches</span>
+                <span class="k">if</span> <span class="n">num_mc_batches</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="n">num_mc_batches</span>
+            <span class="p">),</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">effective_batch_size</span><span class="p">,</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="n">variance_output_dir</span><span class="p">,</span>
+            <span class="n">algorithm_output_dir</span><span class="o">=</span><span class="n">algorithm_output_dir</span><span class="p">,</span>
+            <span class="n">asset_root</span><span class="o">=</span><span class="n">asset_root</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">study</span> <span class="o">==</span> <span class="s2">"variance-validation"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_run_variance_validation</span><span class="p">(</span>
+            <span class="n">num_mc_batches</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">umi_3gpp_config</span><span class="o">.</span><span class="n">num_mc_batches</span>
+                <span class="k">if</span> <span class="n">num_mc_batches</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="n">num_mc_batches</span>
+            <span class="p">),</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">effective_batch_size</span><span class="p">,</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="n">variance_output_dir</span><span class="p">,</span>
+            <span class="n">algorithm_output_dir</span><span class="o">=</span><span class="n">algorithm_output_dir</span><span class="p">,</span>
+            <span class="n">asset_root</span><span class="o">=</span><span class="n">asset_root</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s2">"`study` must be 'training', 'training-validation', 'variance', "</span>
+        <span class="s2">"or 'variance-validation'."</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Parse command-line arguments and run one Baur v2 tuning stage."""</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--study"</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">"training"</span><span class="p">,</span>
+            <span class="s2">"training-validation"</span><span class="p">,</span>
+            <span class="s2">"variance"</span><span class="p">,</span>
+            <span class="s2">"variance-validation"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"training"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--n-trials"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--num-mc-batches"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--batch-size"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--output-dir"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--algorithm-output-dir"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--asset-root"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--training-data-manifest"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">run_tuning</span><span class="p">(</span>
+        <span class="n">study</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">study</span><span class="p">,</span>
+        <span class="n">n_trials</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">n_trials</span><span class="p">,</span>
+        <span class="n">num_mc_batches</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">num_mc_batches</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span>
+        <span class="n">algorithm_output_dir</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">algorithm_output_dir</span><span class="p">,</span>
+        <span class="n">asset_root</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">asset_root</span><span class="p">,</span>
+        <span class="n">training_data_manifest</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">training_data_manifest</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

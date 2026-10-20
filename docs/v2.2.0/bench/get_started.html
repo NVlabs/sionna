@@ -1,0 +1,935 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Get Started &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cffce40c" />
+    <link rel="stylesheet" type="text/css" href="../_static/leaderboard/styles.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'bench/get_started';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../_static/custom-icons.js?v=787b2cb3"></script>
+    <script type="module" src="../_static/leaderboard/app.js"></script>
+    <link rel="canonical" href="/sionna/bench/get_started.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="“Made with Sionna”" href="../made_with_sionna.html" />
+    <link rel="prev" title="InterpolatedDNNChannelEstimator" href="benchmarks/mimo_ofdm_chest/estimators/neural_networks/sionna.bench.mimo_ofdm_chest.papers.melgar2022.InterpolatedDNNChannelEstimator.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Bench
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="benchmarks/index.html">Benchmarks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/index.html">MIMO-OFDM Channel Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/leaderboard.html">Leaderboard</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/index.html">Channel Estimators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/linear/index.html">Linear Channel Estimators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/linear/sionna.phy.ofdm.LSChannelEstimator.html">LSChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/linear/sionna.phy.ofdm.LMMSEChannelEstimator.html">LMMSEChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/linear/sionna.bench.mimo_ofdm_chest.papers.edfors1996.TruncatedChannelEstimator.html">TruncatedChannelEstimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/interpolators/index.html">Channel Interpolators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/interpolators/sionna.phy.ofdm.NearestNeighborInterpolator.html">NearestNeighborInterpolator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/interpolators/sionna.phy.ofdm.LinearInterpolator.html">LinearInterpolator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/interpolators/sionna.bench.mimo_ofdm_chest.papers.coleri2002.CombInterpolator.html">CombInterpolator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/sparse/index.html">Sparsity-Based Channel Estimators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/sparse/sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator.html">RKHSChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/sparse/sionna.bench.mimo_ofdm_chest.papers.lyu2026.SparseDiffuseChannelEstimator.html">SparseDiffuseChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/sparse/sionna.bench.mimo_ofdm_chest.papers.wei2017.SBLChannelEstimator.html">SBLChannelEstimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/latent_variable/index.html">Latent Variable-Based Channel Estimators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/latent_variable/sionna.bench.mimo_ofdm_chest.papers.baur2022.VAEChannelEstimator.html">VAEChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/latent_variable/sionna.bench.mimo_ofdm_chest.papers.koller2022.SpatialGMMChannelEstimator.html">SpatialGMMChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/latent_variable/sionna.bench.mimo_ofdm_chest.papers.koller2022.SpectralGMMChannelEstimator.html">SpectralGMMChannelEstimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/neural_networks/index.html">Neural Network-Based Channel Estimators</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/neural_networks/sionna.bench.mimo_ofdm_chest.papers.li2020.ReEsNetChannelEstimator.html">ReEsNetChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/neural_networks/sionna.bench.mimo_ofdm_chest.papers.balevi2020.DeepPriorChannelEstimator.html">DeepPriorChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/neural_networks/sionna.bench.mimo_ofdm_chest.papers.melgar2022.DNNChannelEstimator.html">DNNChannelEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/neural_networks/sionna.bench.mimo_ofdm_chest.papers.melgar2022.InterpolatedDNNChannelEstimator.html">InterpolatedDNNChannelEstimator</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Get Started</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Bench</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Get Started</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="get-started">
+<h1>Get Started<a class="headerlink" href="#get-started" title="Link to this heading">#</a></h1>
+<p>This guide covers the installation of Sionna Bench, how to display the leaderboard locally,
+how to add your own method for comparison, and how to reproduce the leaderboard results.</p>
+<p>Although not necessary, we recommend running Sionna in a
+<a class="reference external" href="https://www.docker.com">Docker container</a> and/or <a class="reference external" href="https://docs.python.org/3/library/venv.html">Python virtual
+environment</a>.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<p>Clone the repository and enter its root directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>https://github.com/NVlabs/sionna-bench.git
+<span class="nb">cd</span><span class="w"> </span>sionna-bench
+</pre></div>
+</div>
+<p>Install Sionna Bench from the repository root.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+<p>The tests require the optional test dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[test]"</span>
+</pre></div>
+</div>
+<p>The tuning commands require the optional tuning dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[tuning]"</span>
+</pre></div>
+</div>
+<p>Building the documentation requires the optional documentation dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[docs]"</span>
+</pre></div>
+</div>
+<p>Confirm that the active environment imports Sionna and Sionna Bench:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;'PY'</span>
+<span class="s">from importlib.metadata import version</span>
+<span class="s">import sionna.bench</span>
+
+<span class="s">print(version("sionna-bench"))</span>
+<span class="s">PY</span>
+</pre></div>
+</div>
+<p>The command should print the version of Sionna Bench.</p>
+</section>
+<section id="local-leaderboard">
+<span id="get-started-local-leaderboard"></span><h2>Local Leaderboard<a class="headerlink" href="#local-leaderboard" title="Link to this heading">#</a></h2>
+<p>The repository includes the numerical results necessary to display the leaderboard locally
+without rerunning the benchmark. To display the leaderboard locally, start a
+static HTTP server from the repository root:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>http.server<span class="w"> </span><span class="m">8000</span><span class="w"> </span>--directory<span class="w"> </span>leaderboard/mimo_ofdm_chest
+</pre></div>
+</div>
+<p>Open <a class="reference external" href="http://localhost:8000">http://localhost:8000</a> in a browser. Stop the server with <kbd class="kbd docutils literal notranslate">Ctrl</kbd>-<kbd class="kbd docutils literal notranslate">C</kbd>.</p>
+</section>
+<section id="adding-a-new-method">
+<h2>Adding a New Method<a class="headerlink" href="#adding-a-new-method" title="Link to this heading">#</a></h2>
+<p>A new method can be added in an external project or in a new module below
+<code class="docutils literal notranslate"><span class="pre">src/sionna/bench/&lt;benchmark_identifier&gt;/papers</span></code>. It only needs to implement
+the interface of the applicable Sionna block and be passed to the shared
+evaluation pipeline.</p>
+<p>For instance, to add your own channel estimator to the MIMO-OFDM Channel
+Estimation Benchmark, subclass Sionna’s <a class="reference internal" href="../phy/api/ofdm/sionna.phy.ofdm.BasePilotChannelEstimator.html#sionna.phy.ofdm.BasePilotChannelEstimator" title="sionna.phy.ofdm.BasePilotChannelEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasePilotChannelEstimator</span></code></a>
+or <a class="reference internal" href="../phy/api/ofdm/sionna.phy.ofdm.BaseChannelEstimator.html#sionna.phy.ofdm.BaseChannelEstimator" title="sionna.phy.ofdm.BaseChannelEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseChannelEstimator</span></code></a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">examples/custom_estimator.py</span></code> contains a minimal example of a MIMO-OFDM
+channel estimator. It subclasses Sionna’s <a class="reference internal" href="../phy/api/ofdm/sionna.phy.ofdm.BaseChannelEstimator.html#sionna.phy.ofdm.BaseChannelEstimator" title="sionna.phy.ofdm.BaseChannelEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseChannelEstimator</span></code></a>,
+estimates the channel at pilot locations with least squares followed by scalar shrinkage,
+and delegates full-grid reconstruction to Sionna’s configured interpolator.
+<code class="docutils literal notranslate"><span class="pre">examples/run_custom_benchmark.py</span></code> evaluates it and records the
+result through the shared result store.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ShrinkageLSChannelEstimator</span><span class="p">(</span><span class="n">BasePilotChannelEstimator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Apply a unit-variance Gaussian shrinkage prior to pilot LS estimates."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_at_pilot_locations</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">y_pilots</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">no</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Return posterior pilot estimates and their error variances."""</span>
+
+        <span class="c1"># Reuse the LS implementation, which only requires the pilot pattern</span>
+        <span class="c1"># provided by BasePilotChannelEstimator.</span>
+        <span class="n">h_ls</span><span class="p">,</span> <span class="n">ls_err_var</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">LSChannelEstimator</span><span class="o">.</span><span class="n">estimate_at_pilot_locations</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="n">y_pilots</span><span class="p">,</span>
+                <span class="n">no</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">gain</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">ls_err_var</span><span class="p">)</span>
+        <span class="n">h_hat</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">*</span> <span class="n">h_ls</span>
+        <span class="n">err_var</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">gain</span> <span class="o">*</span> <span class="n">ls_err_var</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">h_hat</span><span class="p">,</span> <span class="n">err_var</span>
+</pre></div>
+</div>
+<p>The important benchmark integration calls are:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">evaluate_example</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"outputs/mimo_ofdm_chest"</span><span class="p">),</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Evaluate the example estimator and register its canonical result."""</span>
+    <span class="n">overrides</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"output_dir"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)}</span>
+    <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">overrides</span><span class="p">[</span><span class="s2">"device"</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span><span class="n">umi_3gpp_config</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">)</span>
+
+    <span class="n">constructor_arguments</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"interpolation_type"</span><span class="p">:</span> <span class="s2">"lin_time_avg"</span><span class="p">}</span>
+    <span class="n">result_name</span> <span class="o">=</span> <span class="n">ShrinkageLSChannelEstimator</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="n">result_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">prepare_paper_result_dir</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">"custom"</span><span class="p">))</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">evaluate_channel_estimator</span><span class="p">(</span>
+        <span class="n">ShrinkageLSChannelEstimator</span><span class="p">,</span>
+        <span class="n">cfg</span><span class="p">,</span>
+        <span class="n">result_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result_name</span><span class="si">}</span><span class="s2">.npz"</span><span class="p">,</span>
+        <span class="n">estimator_kwargs</span><span class="o">=</span><span class="n">constructor_arguments</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">record_result</span><span class="p">(</span>
+        <span class="n">cfg</span><span class="p">,</span>
+        <span class="s2">"custom"</span><span class="p">,</span>
+        <span class="n">ShrinkageLSChannelEstimator</span><span class="p">,</span>
+        <span class="n">result_name</span><span class="o">=</span><span class="n">result_name</span><span class="p">,</span>
+        <span class="n">constructor_arguments</span><span class="o">=</span><span class="n">constructor_arguments</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">evaluate_channel_estimator()</span></code> runs the common communication system and
+writes the metric arrays. <code class="docutils literal notranslate"><span class="pre">record_result()</span></code> then adds the estimator class and
+effective algorithmic settings to the scenario-local <code class="docutils literal notranslate"><span class="pre">results.json</span></code>.
+You can run it from the repository root with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>examples.run_custom_benchmark
+</pre></div>
+</div>
+<p>Pass <code class="docutils literal notranslate"><span class="pre">--device</span> <span class="pre">cpu</span></code> to evaluate the estimator on CPU if you do not have a CUDA-capable GPU.
+After the result is recorded, regenerate <code class="docutils literal notranslate"><span class="pre">leaderboard/mimo_ofdm_chest/data.json</span></code> by running</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>leaderboard/mimo_ofdm_chest/generate_data.py
+</pre></div>
+</div>
+<p>and serve the local dashboard as described above.</p>
+</section>
+<section id="reproducing-results">
+<h2>Reproducing Results<a class="headerlink" href="#reproducing-results" title="Link to this heading">#</a></h2>
+<p>Each implementation in <code class="docutils literal notranslate"><span class="pre">src/sionna/bench/mimo_ofdm_chest/papers</span></code> provides a <code class="docutils literal notranslate"><span class="pre">run_benchmark.py</span></code>
+module. Its command-line defaults are the selected estimator and asset-generation settings;
+arguments are needed only to choose a method, set the execution device,
+select external storage, or deliberately override a default. Full runs are computationally expensive.</p>
+<p>The configuration selects <code class="docutils literal notranslate"><span class="pre">cuda:0</span></code> by default, but a CUDA-capable
+GPU is not required to run an evaluation. Pass <code class="docutils literal notranslate"><span class="pre">--device</span> <span class="pre">cpu</span></code> to any paper
+runner, including asset-preparation commands. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>sionna.bench.mimo_ofdm_chest.papers.delfeld2025.run_benchmark<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--device<span class="w"> </span>cpu
+</pre></div>
+</div>
+<p>Displaying the local leaderboard does not require a GPU. Full evaluations,
+statistical fitting, and especially neural-network training can take
+substantially longer on CPU.</p>
+<p>An estimator that requires no persistent assets (such as trained weights or statistics)
+can be evaluated directly. For example, this command regenerates the result for
+the <a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/sparse/sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator.html#sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator" title="sionna.bench.mimo_ofdm_chest.papers.delfeld2025.RKHSChannelEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">RKHSChannelEstimator</span></code></a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>sionna.bench.mimo_ofdm_chest.papers.delfeld2025.run_benchmark
+</pre></div>
+</div>
+<p>For an implementation with several methods, select one method explicitly. For example, this
+command evaluates the low-pass interpolator of the
+<a class="reference internal" href="benchmarks/mimo_ofdm_chest/estimators/interpolators/sionna.bench.mimo_ofdm_chest.papers.coleri2002.CombInterpolator.html#sionna.bench.mimo_ofdm_chest.papers.coleri2002.CombInterpolator" title="sionna.bench.mimo_ofdm_chest.papers.coleri2002.CombInterpolator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CombInterpolator</span></code></a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>sionna.bench.mimo_ofdm_chest.papers.coleri2002.run_benchmark<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--method<span class="w"> </span>low-pass
+</pre></div>
+</div>
+<p>Results are written below <code class="docutils literal notranslate"><span class="pre">outputs/mimo_ofdm_chest/&lt;paper&gt;/&lt;scenario&gt;/</span></code>. The NPZ file stores
+the metric curves, while the neighboring <code class="docutils literal notranslate"><span class="pre">config.json</span></code> and <code class="docutils literal notranslate"><span class="pre">results.json</span></code>
+record the system configuration and estimator settings.</p>
+<p>For methods that require persistent assets such as covariances, fitted statistical
+models, or trained network states, these assets need to be generated explicitly.
+To this end, first execute the runner with the <code class="docutils literal notranslate"><span class="pre">--prepare-assets</span></code> flag to generate the assets,
+and then again without the flag to evaluate the method with the generated assets.
+For example, the spatial GMM is fitted and evaluated with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>sionna.bench.mimo_ofdm_chest.papers.koller2022.run_benchmark<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prepare-assets<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--asset-root<span class="w"> </span>generated-assets<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--method<span class="w"> </span>spatial
+
+python<span class="w"> </span>-m<span class="w"> </span>sionna.bench.mimo_ofdm_chest.papers.koller2022.run_benchmark<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--asset-root<span class="w"> </span>generated-assets<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--method<span class="w"> </span>spatial
+</pre></div>
+</div>
+<p>The preparation command uses the benchmark-matching defaults documented by
+the paper module. It writes a manifest beside the payloads and validates the
+completed asset through the same strict loader used during evaluation. Each
+paper README documents its available methods and any additional generation
+arguments.</p>
+<p>There is a helper script that invokes every paper runner in a separate Python
+process. To regenerate all required assets and then all canonical results,
+you can run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/mimo_ofdm_chest/reproduce_results.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--all<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prepare-assets<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--asset-root<span class="w"> </span>generated-assets
+</pre></div>
+</div>
+<p>Existing compatible assets can be reused by omitting <code class="docutils literal notranslate"><span class="pre">--prepare-assets</span></code>.
+Use one or more <code class="docutils literal notranslate"><span class="pre">--paper</span></code> options instead of <code class="docutils literal notranslate"><span class="pre">--all</span></code> to run a subset, and
+<code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> to inspect the commands without executing them:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/mimo_ofdm_chest/reproduce_results.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--paper<span class="w"> </span>coleri2002<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--paper<span class="w"> </span>delfeld2025<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--dry-run
+</pre></div>
+</div>
+<p>Pass an <code class="docutils literal notranslate"><span class="pre">--output-dir</span></code> to place generated result trees outside of <code class="docutils literal notranslate"><span class="pre">outputs</span></code> and
+a <code class="docutils literal notranslate"><span class="pre">--device</span></code> to override the configured execution device.</p>
+<p>Paper modules with tunable hyperparameters provide a separate <code class="docutils literal notranslate"><span class="pre">tuning</span></code> command.
+That command does not rewrite estimator defaults or canonical results.
+For example, the RKHS algorithmic study and its paired validation can be run as:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>sionna.bench.mimo_ofdm_chest.papers.delfeld2025.tuning<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--study<span class="w"> </span>rkhs<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output-dir<span class="w"> </span>tuning/mimo_ofdm_chest/delfeld2025/my-rkhs-study
+
+python<span class="w"> </span>-m<span class="w"> </span>sionna.bench.mimo_ofdm_chest.papers.delfeld2025.tuning<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--study<span class="w"> </span>rkhs-validation<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output-dir<span class="w"> </span>tuning/mimo_ofdm_chest/delfeld2025/my-rkhs-study
+</pre></div>
+</div>
+<p>The corresponding search spaces and tuning budgets are documented in the
+paper-local tuning dosctring.</p>
+<p id="get-started-refresh-leaderboard">After outputs have changed, rebuild the dashboard data with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>leaderboard/mimo_ofdm_chest/generate_data.py
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="benchmarks/mimo_ofdm_chest/estimators/neural_networks/sionna.bench.mimo_ofdm_chest.papers.melgar2022.InterpolatedDNNChannelEstimator.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">InterpolatedDNNChannelEstimator</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../made_with_sionna.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">“Made with Sionna”</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#local-leaderboard">Local Leaderboard</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-new-method">Adding a New Method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reproducing-results">Reproducing Results</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/bench/get_started.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
