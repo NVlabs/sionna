@@ -220,7 +220,6 @@ class TestComplex2RealChannel:
 class TestWhitenChannel:
     """Tests for whiten_channel."""
 
-
     @pytest.mark.parametrize("num_rx", [2, 4])
     def test_receiver_frame_preserves_noise_weighted_distances(
         self, device, precision, num_rx
@@ -285,8 +284,22 @@ class TestWhitenChannel:
             hp = transform @ h
             sp = transform @ s @ transform.mH
             yw, hw = whiten_channel(yp, hp, sp, return_s=False)
-            torch.testing.assert_close(distances(yw, hw), d0, rtol=0, atol=tol)
-            torch.testing.assert_close(hw.mH @ hw, gram0, rtol=0, atol=tol)
+
+            # Recompute the transformed-frame observables independently too.
+            residual_p = yp.unsqueeze(0) - symbols @ hp.T
+            direct_d_p = (
+                residual_p.conj() * torch.linalg.solve(sp, residual_p.T).T
+            ).sum(dim=-1).real
+            direct_gram_p = hp.mH @ torch.linalg.solve(sp, hp)
+
+            torch.testing.assert_close(
+                distances(yw, hw), direct_d_p, rtol=0, atol=tol
+            )
+            torch.testing.assert_close(
+                hw.mH @ hw, direct_gram_p, rtol=0, atol=tol
+            )
+            torch.testing.assert_close(direct_d_p, d0, rtol=0, atol=tol)
+            torch.testing.assert_close(direct_gram_p, gram0, rtol=0, atol=tol)
 
         # Negative control: a transformed receiver signal with an untransformed
         # covariance is a different physical noise model, not a change of frame.
