@@ -176,6 +176,82 @@ class TestMaximumLikelihoodDetector:
         assert z.dtype == torch.int32
 
 
+    @pytest.mark.parametrize("output", ["bit", "symbol"])
+    @pytest.mark.parametrize("demapping_method", ["app", "maxlog"])
+    def test_ml_detector_receiver_frame_invariance(
+        self, device, precision, output, demapping_method
+    ):
+        """ML outputs must survive a coherent nonunitary receiver-frame change."""
+        rdtype = torch.float32 if precision == "single" else torch.float64
+        cdtype = torch.complex64 if precision == "single" else torch.complex128
+        batch_size = 4
+        num_rx = 4
+        num_streams = 2
+
+        detector = MaximumLikelihoodDetector(
+            output=output,
+            demapping_method=demapping_method,
+            num_streams=num_streams,
+            constellation_type="qam",
+            num_bits_per_symbol=2,
+            precision=precision,
+            device=device,
+        )
+
+        real = torch.arange(
+            1,
+            batch_size * num_rx * num_streams + 1,
+            dtype=rdtype,
+            device=device,
+        ).reshape(batch_size, num_rx, num_streams)
+        h = torch.complex(real / 32, torch.flip(real, [1]) / 47).to(cdtype)
+
+        x = torch.tensor(
+            [
+                [1 + 1j, -1 + 1j],
+                [-1 - 1j, 1 - 1j],
+                [1 - 1j, 1 + 1j],
+                [-1 + 1j, -1 - 1j],
+            ],
+            dtype=cdtype,
+            device=device,
+        ) / np.sqrt(2)
+        noise = torch.complex(
+            torch.linspace(0.03, 0.09, batch_size * num_rx, dtype=rdtype,
+                           device=device).reshape(batch_size, num_rx),
+            torch.linspace(-0.04, 0.05, batch_size * num_rx, dtype=rdtype,
+                           device=device).reshape(batch_size, num_rx),
+        )
+        y = (h @ x.unsqueeze(-1)).squeeze(-1) + noise
+
+        c = torch.eye(num_rx, dtype=cdtype, device=device)
+        c[0, 1] = 0.2 + 0.07j
+        c[-1, 0] = -0.1 + 0.04j
+        s0 = c @ c.mH + 0.5 * torch.eye(num_rx, dtype=cdtype, device=device)
+        s = s0.unsqueeze(0).expand(batch_size, -1, -1).clone()
+
+        w = torch.diag(
+            torch.tensor([0.8, 1.1, 1.2, 1.4], dtype=rdtype, device=device)
+        ).to(cdtype)
+        w[0, 1] = 0.18 + 0.06j
+        w[-1, 0] = -0.09 + 0.03j
+        w2 = torch.eye(num_rx, dtype=cdtype, device=device)
+        w2[0, -1] = 0.08 - 0.04j
+        w2[-1, -1] = 1.1 + 0.02j
+
+        reference = detector(y, h, s)
+        tol = 1e-4 if precision == "single" else 1e-10
+        assert torch.isfinite(reference).all()
+
+        for transform in (w, w2 @ w):
+            yp = (transform @ y.unsqueeze(-1)).squeeze(-1)
+            hp = transform @ h
+            sp = transform @ s @ transform.mH
+            actual = detector(yp, hp, sp)
+            assert torch.isfinite(actual).all()
+            torch.testing.assert_close(actual, reference, rtol=0, atol=tol)
+
+
 class TestKBestDetector:
     """Tests for KBestDetector class."""
 
