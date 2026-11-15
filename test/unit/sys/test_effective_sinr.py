@@ -47,6 +47,22 @@ def get_sinr_eff_numpy(
 class TestEffectiveSINR:
     """Tests for the EESM effective SINR computation."""
 
+    @pytest.mark.parametrize("precision", ["single", "double"])
+    @pytest.mark.parametrize("per_stream", [False, True])
+    def test_high_sinr_does_not_underflow(self, device, precision, per_stream):
+        """Equal high SINRs should survive aggregation and resource masking."""
+        eesm = EESM(sinr_eff_max_db=50.0, precision=precision, device=device)
+        high_sinr = 10_000.0  # 40 dB
+        sinr = torch.full((1, 2, 3, 2, 2), high_sinr, dtype=eesm.dtype, device=device)
+        sinr[..., 1, :] = 0.0  # The second user has no allocated resources.
+        sinr[:, 0, :, 0, 1] = 0.0  # The first user's second stream is partly allocated.
+
+        actual = eesm(sinr, mcs_index=2, mcs_table_index=2, per_stream=per_stream)
+        expected = sinr.new_tensor(
+            [[[high_sinr, high_sinr], [0.0, 0.0]]] if per_stream else [[high_sinr, 0.0]]
+        )
+        torch.testing.assert_close(actual, expected)
+
     def test_unused_resources_return_zero(self, device):
         """Unused users and streams remain zero below the clamp floor."""
         eff_sinr_obj = EESM(device=device)
