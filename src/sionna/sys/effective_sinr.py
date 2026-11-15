@@ -400,7 +400,8 @@ class EESM(EffectiveSINR):
         # [..., num_ut, num_streams_per_ut]
         # If per_stream is False: n. used subcarriers and layers per rx
         # [..., num_ut]
-        num_used_res = (sinr > 0).to(self.dtype).sum(dim=axis)
+        used_res = sinr > 0
+        num_used_res = used_res.to(self.dtype).sum(dim=axis)
 
         # Ensure MCS is non-negative (for non-scheduled UTs)
         mcs_index = torch.maximum(mcs_index, torch.tensor(0, device=self.device))
@@ -415,16 +416,15 @@ class EESM(EffectiveSINR):
         # [..., num_ut, 1, 1, 1]
         beta_expand1 = expand_to_rank(beta, sinr.dim(), axis=-1)
 
-        # Exponentiate SINR
-        # [..., num_ut, num_streams_per_ut, num_ofdm_symbols, num_subcarriers]
-        sinr_exp = torch.where(sinr > 0, torch.exp(-sinr / beta_expand1), torch.tensor(0.0, device=self.device))
-
-        # Log + average across resources
-        sinr_eff = torch.log(sinr_exp.sum(dim=axis) / num_used_res)
-        beta_expand2 = expand_to_rank(beta, sinr_eff.dim(), axis=-1)
+        # Average in log space to avoid underflow at high SINR.
+        scaled_sinr = torch.where(used_res, -sinr / beta_expand1, -torch.inf)
+        log_mean_exp = torch.logsumexp(scaled_sinr, dim=axis) - torch.log(
+            num_used_res.clamp_min(1)
+        )
+        beta_expand2 = expand_to_rank(beta, log_mean_exp.dim(), axis=-1)
         # If per_stream is True: [..., num_ut, num_streams_per_ut]
         # If per_stream is False: [..., num_ut]
-        sinr_eff = -beta_expand2 * sinr_eff
+        sinr_eff = -beta_expand2 * log_mean_exp
 
         # Project sinr_eff within [self._sinr_eff_min, self._sinr_eff_max]
         sinr_eff = torch.clamp(sinr_eff, self._sinr_eff_min, self._sinr_eff_max)
