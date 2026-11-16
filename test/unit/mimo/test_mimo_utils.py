@@ -220,6 +220,92 @@ class TestComplex2RealChannel:
 class TestWhitenChannel:
     """Tests for whiten_channel."""
 
+    @pytest.mark.parametrize("num_rx", [2, 4])
+    def test_receiver_frame_preserves_noise_weighted_distances(
+        self, device, precision, num_rx
+    ):
+        """Nonunitary receiver coordinates must transport noise covariance too."""
+        cdtype = torch.complex64 if precision == "single" else torch.complex128
+        rdtype = torch.float32 if precision == "single" else torch.float64
+
+        real = torch.arange(
+            1, num_rx * 2 + 1, dtype=rdtype, device=device
+        ).reshape(num_rx, 2)
+        h = torch.complex(
+            real / (2 * num_rx), torch.flip(real, [0]) / (3 * num_rx)
+        ).to(cdtype)
+
+        c = torch.eye(num_rx, dtype=cdtype, device=device)
+        c[0, 1] = 0.25 + 0.1j
+        c[-1, 0] = -0.13 + 0.08j
+        s = c @ c.mH
+
+        w = torch.diag(
+            torch.linspace(0.8, 1.4, num_rx, dtype=rdtype, device=device)
+        ).to(cdtype)
+        w[0, 1] = 0.2 + 0.1j
+        w[-1, 0] = -0.1 + 0.05j
+        w2 = torch.eye(num_rx, dtype=cdtype, device=device)
+        w2[0, -1] = -0.08 + 0.12j
+        w2[-1, -1] = 1.1 + 0.15j
+
+        symbols = torch.tensor(
+            [[1 + 0j, 1j], [-1 + 0j, 1j], [1j, -1j], [-1j, -1]],
+            dtype=cdtype,
+            device=device,
+        )
+        noise = torch.complex(
+            torch.linspace(0.07, 0.17, num_rx, dtype=rdtype, device=device),
+            torch.linspace(-0.05, 0.11, num_rx, dtype=rdtype, device=device),
+        )
+        y = h @ symbols[0] + noise
+
+        def distances(yw, hw):
+            residual = yw.unsqueeze(0) - symbols @ hw.T
+            return residual.abs().square().sum(dim=-1)
+
+        yw0, hw0 = whiten_channel(y, h, s, return_s=False)
+        d0 = distances(yw0, hw0)
+        gram0 = hw0.mH @ hw0
+        tol = 7e-5 if precision == "single" else 1e-11
+
+        # Independent arithmetic path: compare whitening against direct
+        # covariance solves rather than using whitening as its own oracle.
+        residual = y.unsqueeze(0) - symbols @ h.T
+        direct_d = (
+            residual.conj() * torch.linalg.solve(s, residual.T).T
+        ).sum(dim=-1).real
+        direct_gram = h.mH @ torch.linalg.solve(s, h)
+        torch.testing.assert_close(d0, direct_d, rtol=0, atol=tol)
+        torch.testing.assert_close(gram0, direct_gram, rtol=0, atol=tol)
+
+        for transform in (w, w2 @ w):
+            yp = transform @ y
+            hp = transform @ h
+            sp = transform @ s @ transform.mH
+            yw, hw = whiten_channel(yp, hp, sp, return_s=False)
+
+            # Recompute the transformed-frame observables independently too.
+            residual_p = yp.unsqueeze(0) - symbols @ hp.T
+            direct_d_p = (
+                residual_p.conj() * torch.linalg.solve(sp, residual_p.T).T
+            ).sum(dim=-1).real
+            direct_gram_p = hp.mH @ torch.linalg.solve(sp, hp)
+
+            torch.testing.assert_close(
+                distances(yw, hw), direct_d_p, rtol=0, atol=tol
+            )
+            torch.testing.assert_close(
+                hw.mH @ hw, direct_gram_p, rtol=0, atol=tol
+            )
+            torch.testing.assert_close(direct_d_p, d0, rtol=0, atol=tol)
+            torch.testing.assert_close(direct_gram_p, gram0, rtol=0, atol=tol)
+
+        # Negative control: a transformed receiver signal with an untransformed
+        # covariance is a different physical noise model, not a change of frame.
+        yw_bad, hw_bad = whiten_channel(w @ y, w @ h, s, return_s=False)
+        assert (distances(yw_bad, hw_bad) - d0).abs().max() > 0.01
+
     def test_whiten_channel_identity_covariance(self, device, precision):
         """Test whitening with identity covariance (should be no-op on covariance)."""
         rdtype = torch.float32 if precision == "single" else torch.float64
